@@ -130,6 +130,12 @@
       box-shadow: 0 0 0 3px rgba(46,107,79,0.12);
     }
 
+    input.field-corrected,
+    textarea.field-corrected {
+      border-color: var(--forest-light);
+      box-shadow: 0 0 0 3px rgba(74, 153, 112, 0.15);
+    }
+
     textarea {
       min-height: 90px;
       resize: vertical;
@@ -508,10 +514,28 @@
   </div>
 
   <script src="./supabase-config.js"></script>
+  <script src="./text-corrector.js"></script>
   <script>
     const SUPABASE_URL = window.SUPABASE_URL || "";
     const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
     const SESSION_ASSISTANT_KEY = "manosConectadasAsistenteData";
+
+    function fmtPlain(value, mode = "object") {
+      if (!window.TextCorrector || value == null || value === "") return value == null ? "" : String(value);
+      return TextCorrector.correct(String(value), mode);
+    }
+
+    function fmt(value, mode = "object") {
+      if (!window.TextCorrector) return value == null ? "" : String(value);
+      return TextCorrector.formatDisplay(value, mode);
+    }
+
+    function bindResponseTextareas() {
+      if (!window.TextCorrector) return;
+      document.querySelectorAll('textarea[id^="respuesta-"]').forEach((el) => {
+        TextCorrector.bindField(el, { mode: "sentence", liveCapital: true });
+      });
+    }
 
     const panelLogin = document.getElementById("panelLogin");
     const panelApp = document.getElementById("panelApp");
@@ -747,9 +771,9 @@
             <span>${isPrimary ? "Principal" : "Secundario"}</span>
             <strong>${isActive ? "Activo" : "Inactivo"}</strong>
           </div>
-          <h3 style="margin-bottom:6px;">${a.full_name || "Sin nombre"}</h3>
+          <h3 style="margin-bottom:6px;">${fmt(a.full_name || "Sin nombre", "name")}</h3>
           <div style="font-size:13px; line-height:1.45;">
-            <strong>Usuario:</strong> ${a.username || "—"}
+            <strong>Usuario:</strong> ${a.username ? (TextCorrector ? TextCorrector.escapeHtml(a.username) : a.username) : "—"}
           </div>
           ${
             canManage
@@ -808,7 +832,9 @@
         categoria: item.donation?.categoria || "No informada",
         objeto: item.donation?.objeto || "Objeto sin nombre",
         estado: item.donation?.estado || "Sin estado",
-        cantidad: item.donation?.cantidad || "No informada"
+        cantidad: item.donation?.cantidad || "No informada",
+        descripcion: item.donation?.descripcion || "",
+        fecha_vencimiento: item.donation?.fecha_vencimiento || null
       }];
     }
 
@@ -830,7 +856,7 @@
         donations.flatMap((item) => getDonationItems(item).map((d) => (d.categoria || "").trim()).filter(Boolean))
       )).sort((a, b) => a.localeCompare(b, "es"));
       filterCategory.innerHTML = '<option value="">Todas las categorías</option>' +
-        categories.map((cat) => `<option value="${cat}">${cat}</option>`).join("");
+        categories.map((cat) => `<option value="${TextCorrector ? TextCorrector.escapeHtml(cat) : cat}">${fmt(cat, "name")}</option>`).join("");
       filterCategory.value = categories.includes(current) ? current : "";
     }
 
@@ -925,8 +951,12 @@
 
       filteredDonations.forEach((item, index) => {
         const donationId = item.id;
-        const donorName = (item.donor?.nombre || "") + " " + (item.donor?.apellido || "");
+        const donorName = fmt(
+          ((item.donor?.nombre || "") + " " + (item.donor?.apellido || "")).trim() || "Sin nombre",
+          "name"
+        );
         const responseText = item.response?.message || "";
+        const responseDisplay = responseText ? fmt(responseText, "sentence") : "";
         const responseDate = item.response?.date ? formatDate(item.response.date) : "";
         const donationItems = getDonationItems(item);
         const donationNumber = getDonationNumber(item, donations.indexOf(item));
@@ -935,14 +965,23 @@
         const photosHtml = photoList.length
           ? `<div class="photo-list">${photoList.map((src, i) => `<img src="${src}" alt="Foto donación ${i + 1}">`).join("")}</div>`
           : "";
+        const coord = item.coordination || {};
         const itemsHtml = donationItems.map((d, i) => `
           <div style="font-size:13px; line-height:1.45; margin-bottom:${i === donationItems.length - 1 ? "0" : "8px"};">
-            <strong>${i + 1}. ${d.objeto || "Objeto sin nombre"}</strong><br>
-            <strong>Categoría:</strong> ${d.categoria || "No informada"} ·
-            <strong>Estado:</strong> ${d.estado || "Sin estado"} ·
-            <strong>Cantidad:</strong> ${d.cantidad || "No informada"}
+            <strong>${i + 1}. ${fmt(d.objeto || "Objeto sin nombre", "object")}</strong><br>
+            <strong>Categoría:</strong> ${fmt(d.categoria || "No informada", "name")} ·
+            <strong>Estado:</strong> ${fmt(d.estado || "Sin estado", "name")} ·
+            <strong>Cantidad:</strong> ${fmt(d.cantidad || "No informada", "light")}
+            ${d.descripcion ? `<br><strong>Descripción:</strong> ${fmt(d.descripcion, "sentence")}` : ""}
+            ${d.fecha_vencimiento ? `<br><strong>Vencimiento:</strong> ${TextCorrector ? TextCorrector.escapeHtml(d.fecha_vencimiento) : d.fecha_vencimiento}` : ""}
           </div>
         `).join("");
+        const coordinationHtml = `
+          ${coord.direccion ? `<br><strong>Dirección:</strong> ${fmt(coord.direccion, "sentence")}` : ""}
+          ${coord.horario ? `<br><strong>Horario:</strong> ${fmt(coord.horario, "sentence")}` : ""}
+          ${coord.referencias ? `<br><strong>Referencias:</strong> ${fmt(coord.referencias, "sentence")}` : ""}
+          ${coord.preferencia ? `<br><strong>Preferencia:</strong> ${fmt(coord.preferencia, "sentence")}` : ""}
+        `;
 
         const article = document.createElement("article");
         article.className = "donation-item";
@@ -958,14 +997,16 @@
           ${photosHtml}
           <div style="margin-bottom:8px;">${itemsHtml}</div>
           <div style="font-size:13px; line-height:1.45;">
-            <strong>Donador:</strong> ${donorName.trim() || "Sin nombre"}<br>
-            <strong>Email:</strong> ${item.donor?.email || "No informado"}<br>
-            <strong>Teléfono:</strong> ${item.donor?.telefono || "No informado"}<br>
+            <strong>Donador:</strong> ${donorName}<br>
+            <strong>Email:</strong> ${item.donor?.email ? (TextCorrector ? TextCorrector.escapeHtml(item.donor.email) : item.donor.email) : "No informado"}<br>
+            <strong>Teléfono:</strong> ${item.donor?.telefono ? (TextCorrector ? TextCorrector.escapeHtml(item.donor.telefono) : item.donor.telefono) : "No informado"}<br>
+            <strong>Tipo donante:</strong> ${fmt(item.donor?.tipo || "No informado", "name")}<br>
             <strong>Modalidad:</strong> ${item.coordination?.modalidad === "retiro" ? "Retiro a domicilio" : item.coordination?.modalidad === "llevar" ? "La lleva al Municipio" : "No informada"}
+            ${coordinationHtml}
           </div>
           <div class="resp-box">
             <label for="respuesta-${donationId}" style="margin-top:0;">Respuesta para el donador</label>
-            <textarea id="respuesta-${donationId}" placeholder="Escribí un mensaje de seguimiento o coordinación...">${responseText}</textarea>
+            <textarea id="respuesta-${donationId}" placeholder="Escribí un mensaje de seguimiento o coordinación...">${responseText ? (TextCorrector ? TextCorrector.escapeHtml(TextCorrector.correct(responseText, "sentence")) : responseText) : ""}</textarea>
             <div class="inline-actions">
               <button class="btn btn-primary" data-save="${donationId}">Guardar respuesta</button>
               ${responseText ? `<button class="btn btn-secondary" data-delete-response="${donationId}">Eliminar respuesta</button>` : ""}
@@ -974,7 +1015,7 @@
                 : `<button class="btn btn-danger" data-discard="${donationId}">Descartar</button>`
               }
             </div>
-            ${responseText ? `<div class="resp-history"><strong>Última respuesta:</strong> ${responseText}<br><small>Actualizada: ${responseDate}</small></div>` : ""}
+            ${responseText ? `<div class="resp-history"><strong>Última respuesta:</strong> ${responseDisplay}<br><small>Actualizada: ${responseDate}</small></div>` : ""}
           </div>
         `;
         const isDiscarded = item.status === "discarded";
@@ -1004,11 +1045,14 @@
       document.querySelectorAll("[data-restore]").forEach((btn) => {
         btn.addEventListener("click", () => changeDonationStatus(Number(btn.getAttribute("data-restore")), "pending"));
       });
+
+      bindResponseTextareas();
     }
 
     async function saveResponse(donationId) {
       const input = document.getElementById(`respuesta-${donationId}`);
-      const message = input.value.trim();
+      if (window.TextCorrector) TextCorrector.correctFieldElement(input, "sentence");
+      const message = (window.TextCorrector ? TextCorrector.correct(input.value.trim(), "sentence") : input.value.trim());
 
       if (!message) {
         alert("Escribí una respuesta antes de guardar.");
@@ -1168,7 +1212,8 @@
           loginMsg.className = "";
           loginMsg.textContent = "";
           showApp();
-          showToast(`Bienvenido/a ${normalizedAssistant.full_name || normalizedAssistant.username}.`, "ok", "Ingreso correcto", 3000);
+          const welcomeName = fmtPlain(normalizedAssistant.full_name || normalizedAssistant.username, "name");
+          showToast(`Bienvenido/a ${welcomeName}.`, "ok", "Ingreso correcto", 3000);
         })
         .catch(() => {
           showLoginError("No se pudo validar el acceso en Supabase.");
@@ -1192,8 +1237,13 @@
         showAssistantCreateMessage("error", "Solo el asistente principal puede crear asistentes.");
         return;
       }
+      if (window.TextCorrector) {
+        TextCorrector.correctFieldElement(newAssistantName, "name");
+      }
       const username = newAssistantUser.value.trim();
-      const fullName = newAssistantName.value.trim();
+      const fullName = window.TextCorrector
+        ? TextCorrector.correct(newAssistantName.value.trim(), "name")
+        : newAssistantName.value.trim();
       const password = newAssistantPass.value.trim();
 
       if (!username || !password) {
@@ -1218,6 +1268,12 @@
       if (!currentAssistant?.is_primary) return;
       setAppView(activeAppView === "assistants" ? "donations" : "assistants");
     });
+
+    if (window.TextCorrector) {
+      TextCorrector.initFormCorrector([
+        { id: "newAssistantName", mode: "name", liveCapital: true },
+      ]);
+    }
 
     const savedAssistant = getSessionAssistant();
     if (savedAssistant) {

@@ -298,19 +298,40 @@
   function initFormCorrector(fieldMap) {
     fieldMap.forEach(({ id, mode, liveCapital }) => {
       const el = document.getElementById(id);
-      if (!el) return;
-      if (liveCapital) initLeadingCapitalOnInput(el);
-      el.addEventListener('blur', () => {
-        if (correctFieldElement(el, mode)) flashCorrected(el);
-      });
+      bindField(el, { mode, liveCapital });
     });
+  }
+
+  function bindField(el, { mode = 'object', liveCapital = false } = {}) {
+    if (!el || el.dataset.correctBound === '1') return;
+    el.dataset.correctBound = '1';
+    if (liveCapital) initLeadingCapitalOnInput(el);
+    el.addEventListener('blur', () => {
+      if (correctFieldElement(el, mode)) flashCorrected(el);
+    });
+  }
+
+  function escapeHtml(text) {
+    return String(text ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function formatDisplay(text, mode) {
+    if (text == null || text === '') return '';
+    return escapeHtml(correct(String(text), mode));
   }
 
   global.TextCorrector = {
     correct,
     correctFieldElement,
     initFormCorrector,
+    bindField,
     flashCorrected,
     ensureLeadingCapital,
+    escapeHtml,
+    formatDisplay,
   };
 })(window);
