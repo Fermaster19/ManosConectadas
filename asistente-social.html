@@ -424,6 +424,45 @@
 
     @media (max-width: 700px) {
       .grid-2 { grid-template-columns: 1fr; }
+
+      .topbar {
+        height: auto;
+        min-height: 64px;
+        padding: 10px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .brand {
+        font-size: 17px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .topbar-actions {
+        flex: 1 1 100%;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      .topbar-actions .btn,
+      .topbar-actions a.btn {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .wrap {
+        padding-top: 88px;
+      }
+
+      .login-box {
+        margin-top: 16px;
+      }
+
+      #btnLogin {
+        min-height: 48px;
+        font-size: 15px;
+      }
     }
   </style>
 </head>

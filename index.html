@@ -57,6 +57,13 @@ nav {
 }
 .nav-logo span { color: var(--terracotta); }
 
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: auto;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -73,11 +80,18 @@ nav {
 .nav-links a:hover { color: var(--ink); }
 
 .nav-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   background: var(--forest);
   color: white !important;
   padding: 8px 20px;
   border-radius: 6px;
   font-weight: 600 !important;
+  text-decoration: none;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 /* HERO STRIP */
@@ -962,8 +976,14 @@ textarea { resize: vertical; min-height: 100px; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  nav { padding: 0 20px; }
+  nav { padding: 0 12px; gap: 10px; }
+  .nav-logo { font-size: 18px; }
+  .nav-end { gap: 0; }
   .nav-links { display: none; }
+  .nav-cta {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
   .hero-strip { grid-template-columns: 1fr; padding: 60px 20px 0; }
   .hero-illustration { display: none; }
   .main-wrap { padding: 60px 20px 80px; }
@@ -984,12 +1004,14 @@ textarea { resize: vertical; min-height: 100px; }
 <!-- NAV -->
 <nav>
   <div class="nav-logo">Manos<span> Conectadas</span></div>
-  <ul class="nav-links">
-    <li><a href="#">Inicio</a></li>
-    <li><a href="#">¿Cómo funciona?</a></li>
-    <li><a href="#">Necesidades actuales</a></li>
-    <li><a href="asistente-social.html" class="nav-cta">Iniciar sesión</a></li>
-  </ul>
+  <div class="nav-end">
+    <ul class="nav-links">
+      <li><a href="#">Inicio</a></li>
+      <li><a href="#">¿Cómo funciona?</a></li>
+      <li><a href="#">Necesidades actuales</a></li>
+    </ul>
+    <a href="asistente-social.html" class="nav-cta">Iniciar sesión</a>
+  </div>
 </nav>
 
 <!-- HERO -->
