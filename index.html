@@ -430,6 +430,13 @@ input.error, select.error, textarea.error {
 
 .field-error.visible { display: block; }
 
+input.field-corrected,
+textarea.field-corrected,
+select.field-corrected {
+  border-color: var(--forest-light);
+  box-shadow: 0 0 0 3px rgba(74, 153, 112, 0.15);
+}
+
 textarea { resize: vertical; min-height: 100px; }
 
 /* Category grid */
@@ -1171,6 +1178,7 @@ textarea { resize: vertical; min-height: 100px; }
           <div class="field full">
             <label>Nombre del objeto <span class="req">*</span></label>
             <input type="text" id="objeto" placeholder="Ej: Campera de nena talle 8">
+            <span class="field-hint">Al salir del campo, corregimos ortografía y mayúsculas automáticamente.</span>
             <span class="field-error" id="err-objeto">Describí brevemente qué vas a donar.</span>
           </div>
           <div class="field full">
@@ -1446,6 +1454,7 @@ textarea { resize: vertical; min-height: 100px; }
 </div>
 
 <script src="./supabase-config.js"></script>
+<script src="./text-corrector.js"></script>
 <script>
 let currentStep = 0;
 let selectedCat = '';
@@ -1456,6 +1465,36 @@ let donationItems = [];
 const CATEGORIAS_CON_VENCIMIENTO = ['Alimentos', 'Medicamentos'];
 const SUPABASE_URL = window.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+
+const CORRECTABLE_FIELDS = [
+  { id: 'nombre', mode: 'name' },
+  { id: 'apellido', mode: 'name' },
+  { id: 'objeto', mode: 'sentence' },
+  { id: 'descripcion', mode: 'sentence' },
+  { id: 'cantidad', mode: 'light' },
+  { id: 'direccion', mode: 'sentence' },
+  { id: 'horario', mode: 'sentence' },
+  { id: 'referencias', mode: 'sentence' },
+  { id: 'preferencia', mode: 'sentence' },
+];
+
+function correctFormFields() {
+  if (!window.TextCorrector) return;
+  CORRECTABLE_FIELDS.forEach(({ id, mode }) => {
+    const el = document.getElementById(id);
+    if (el) TextCorrector.correctFieldElement(el, mode);
+  });
+}
+
+function correctDonationDraft(draft) {
+  if (!window.TextCorrector) return draft;
+  return {
+    ...draft,
+    objeto: TextCorrector.correct(draft.objeto, 'sentence'),
+    descripcion: TextCorrector.correct(draft.descripcion, 'sentence'),
+    cantidad: TextCorrector.correct(draft.cantidad, 'light'),
+  };
+}
 
 function selectCat(el, cat) {
   document.querySelectorAll('.cat-option').forEach(c => c.classList.remove('selected'));
@@ -1473,14 +1512,15 @@ function selectEstado(el, estado) {
 }
 
 function getDonationDraft() {
-  return {
+  correctFormFields();
+  return correctDonationDraft({
     categoria: selectedCat || '',
     objeto: document.getElementById('objeto').value.trim(),
     descripcion: document.getElementById('descripcion').value.trim(),
     cantidad: document.getElementById('cantidad').value.trim(),
     estado: selectedEstado || '',
     fechaVencimiento: document.getElementById('fecha-vencimiento').value || ''
-  };
+  });
 }
 
 function requiresVencimiento(categoria) {
@@ -1625,6 +1665,8 @@ function fileToDataURL(file) {
 
 function validateStep(step) {
   let ok = true;
+  if (step === 0) correctFormFields();
+  if (step === 2) correctFormFields();
   if (step === 0) {
     ['nombre','apellido','email','telefono'].forEach(id => {
       const el = document.getElementById(id);
@@ -1724,6 +1766,9 @@ async function submitForm() {
     return;
   }
   document.getElementById('err-terms').classList.remove('visible');
+  correctFormFields();
+  donationItems = donationItems.map(correctDonationDraft);
+  renderDonationItems();
 
   let serializedPhotos = [];
   try {
@@ -1794,6 +1839,10 @@ async function submitForm() {
   document.getElementById('trackingCode').textContent = code;
   document.getElementById('successScreen').classList.add('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+if (window.TextCorrector) {
+  TextCorrector.initFormCorrector(CORRECTABLE_FIELDS);
 }
 </script>
 </body>
