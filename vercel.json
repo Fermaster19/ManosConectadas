@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/donar.html", "destination": "/", "permanent": true }
+  ]
+}
