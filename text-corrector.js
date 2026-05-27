@@ -203,6 +203,16 @@
     });
   }
 
+  function ensureLeadingCapital(text) {
+    if (!text) return '';
+    let i = 0;
+    while (i < text.length && /\s/.test(text[i])) i++;
+    if (i >= text.length || !/[a-záéíóúüñ]/.test(text[i])) return text;
+    const upper = text[i].toLocaleUpperCase('es-AR');
+    if (text[i] === upper) return text;
+    return text.slice(0, i) + upper + text.slice(i + 1);
+  }
+
   function capitalizeSentences(text) {
     if (!text) return text;
     let result = '';
@@ -240,6 +250,8 @@
 
     if (mode === 'name') {
       result = toTitleCaseName(result);
+    } else if (mode === 'object') {
+      result = ensureLeadingCapital(result);
     } else if (mode === 'sentence') {
       result = capitalizeSentences(result);
     } else if (mode === 'light') {
@@ -269,10 +281,25 @@
     window.setTimeout(() => el.classList.remove('field-corrected'), 1600);
   }
 
+  function initLeadingCapitalOnInput(el) {
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const before = el.value;
+      const after = ensureLeadingCapital(before);
+      if (after === before) return;
+      const pos = el.selectionStart;
+      el.value = after;
+      if (typeof pos === 'number') {
+        el.setSelectionRange(pos, pos);
+      }
+    });
+  }
+
   function initFormCorrector(fieldMap) {
-    fieldMap.forEach(({ id, mode }) => {
+    fieldMap.forEach(({ id, mode, liveCapital }) => {
       const el = document.getElementById(id);
       if (!el) return;
+      if (liveCapital) initLeadingCapitalOnInput(el);
       el.addEventListener('blur', () => {
         if (correctFieldElement(el, mode)) flashCorrected(el);
       });
@@ -284,5 +311,6 @@
     correctFieldElement,
     initFormCorrector,
     flashCorrected,
+    ensureLeadingCapital,
   };
 })(window);

@@ -1178,7 +1178,7 @@ textarea { resize: vertical; min-height: 100px; }
           <div class="field full">
             <label>Nombre del objeto <span class="req">*</span></label>
             <input type="text" id="objeto" placeholder="Ej: Campera de nena talle 8">
-            <span class="field-hint">Al salir del campo, corregimos ortografía y mayúsculas automáticamente.</span>
+            <span class="field-hint">La primera letra se escribe en mayúscula automáticamente.</span>
             <span class="field-error" id="err-objeto">Describí brevemente qué vas a donar.</span>
           </div>
           <div class="field full">
@@ -1469,7 +1469,7 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
 const CORRECTABLE_FIELDS = [
   { id: 'nombre', mode: 'name' },
   { id: 'apellido', mode: 'name' },
-  { id: 'objeto', mode: 'sentence' },
+  { id: 'objeto', mode: 'object', liveCapital: true },
   { id: 'descripcion', mode: 'sentence' },
   { id: 'cantidad', mode: 'light' },
   { id: 'direccion', mode: 'sentence' },
@@ -1490,7 +1490,7 @@ function correctDonationDraft(draft) {
   if (!window.TextCorrector) return draft;
   return {
     ...draft,
-    objeto: TextCorrector.correct(draft.objeto, 'sentence'),
+    objeto: TextCorrector.correct(draft.objeto, 'object'),
     descripcion: TextCorrector.correct(draft.descripcion, 'sentence'),
     cantidad: TextCorrector.correct(draft.cantidad, 'light'),
   };
