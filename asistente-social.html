@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente social | Manos Conectadas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F4EF;
+      --white: #FFFFFF;
+      --forest: #1D4B35;
+      --forest-mid: #2E6B4F;
+      --forest-light: #4A9970;
+      --sand: #E8DFD0;
+      --sand-dark: #D4C8B4;
+      --terracotta: #B85C38;
+      --terracotta-light: #D4795A;
+      --ink: #1A1915;
+      --ink-60: rgba(26,25,21,0.6);
+      --ink-30: rgba(26,25,21,0.3);
+      --ink-10: rgba(26,25,21,0.08);
+      --danger: var(--terracotta);
+      --ok: #2E7D52;
+      --radius: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Sora", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 64px;
+      background: rgba(247,244,239,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--sand-dark);
+      padding: 0 16px 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-family: "Lora", serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--forest);
+    }
+
+    .brand span { color: var(--terracotta); }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 96px 18px 24px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 10px 28px rgba(26, 25, 21, 0.06);
+    }
+
+    .login-box {
+      max-width: 460px;
+      margin: 40px auto 0;
+    }
+
+    h1, h2, h3 { margin-top: 0; }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--ink-60);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1.5px solid var(--sand-dark);
+      border-radius: 8px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-family: "Sora", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background: var(--white);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--forest-mid);
+      box-shadow: 0 0 0 3px rgba(46,107,79,0.12);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: "Sora", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--forest);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(29,75,53,0.22);
+    }
+
+    .btn-primary:hover {
+      background: var(--forest-mid);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(29,75,53,0.28);
+    }
+
+    .btn-secondary {
+      background: none;
+      border: 1.5px solid var(--sand-dark);
+      color: var(--ink-60);
+    }
+
+    .btn-danger {
+      border: 1.5px solid rgba(184,92,56,0.4);
+      background: rgba(184,92,56,0.07);
+      color: var(--terracotta);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--ink-60);
+      color: var(--ink);
+    }
+
+    .btn-danger:hover {
+      background: rgba(184,92,56,0.12);
+      border-color: rgba(184,92,56,0.55);
+      color: var(--terracotta);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .error {
+      color: var(--danger);
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .ok {
+      color: var(--ok);
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #panelApp { display: none; }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar h2 { margin: 0; }
+
+    .filters-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin: 10px 0 4px;
+    }
+
+    .donation-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    .donation-item {
+      border: 1px solid var(--sand);
+      border-radius: 12px;
+      padding: 14px;
+      background: var(--white);
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-60);
+      margin-bottom: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(29,75,53,0.08);
+      color: var(--forest);
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-left: 8px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 42px 16px;
+      color: var(--ink-60);
+      border: 1px dashed var(--sand-dark);
+      border-radius: 12px;
+      background: rgba(26,25,21,0.02);
+    }
+
+    .section-title {
+      margin: 18px 0 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--forest);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .admin-panel {
+      margin-bottom: 14px;
+      border: 1px solid var(--sand-dark);
+      border-radius: 12px;
+      padding: 14px;
+      background: rgba(29,75,53,0.04);
+    }
+
+    .admin-panel h3 {
+      margin: 0 0 8px;
+      color: var(--forest);
+      font-size: 16px;
+    }
+
+    .tab-btn {
+      border: 1.5px solid var(--sand-dark);
+      background: var(--white);
+      color: var(--ink-60);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--ink-60);
+      color: var(--ink);
+    }
+
+    .tab-btn.active {
+      background: var(--forest);
+      color: #fff;
+      border-color: var(--forest);
+    }
+
+    .resp-box {
+      margin-top: 10px;
+      border-top: 1px solid var(--sand);
+      padding-top: 10px;
+    }
+
+    .resp-history {
+      background: rgba(26,25,21,0.02);
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--ink-60);
+      line-height: 1.45;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .photo-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .photo-list img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--sand);
+      background: var(--sand);
+    }
+
+    .toast {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .toast.visible { display: flex; }
+
+    .toast-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(26,25,21,0.55);
+      backdrop-filter: blur(2px);
+      animation: overlayIn 0.2s ease-out;
+    }
+
+    .toast-card {
+      position: relative;
+      z-index: 1;
+      width: min(520px, calc(100vw - 32px));
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: 14px;
+      padding: 22px 22px;
+      box-shadow: 0 18px 60px rgba(26, 25, 21, 0.28);
+      color: var(--ink);
+      animation: toastPop 0.22s ease-out;
+      text-align: center;
+    }
+
+    .toast.ok .toast-card { border-color: rgba(46,125,82,0.4); }
+    .toast.error .toast-card { border-color: rgba(184,92,56,0.55); }
+
+    .toast .title {
+      font-family: "Lora", serif;
+      font-weight: 600;
+      font-size: 26px;
+      margin-bottom: 10px;
+      color: var(--forest);
+    }
+
+    .toast .msg {
+      font-size: 15px;
+      color: var(--ink-60);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes toastPop {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 700px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast" role="dialog" aria-modal="true" aria-live="polite" aria-atomic="true">
+    <div class="toast-overlay" aria-hidden="true"></div>
+    <div class="toast-card" role="document" aria-labelledby="toastTitle" aria-describedby="toastMsg">
+      <div class="title" id="toastTitle">Listo</div>
+      <div class="msg" id="toastMsg"></div>
+    </div>
+  </div>
+  <div class="topbar">
+    <div class="brand">Manos<span> Conectadas</span></div>
+    <div class="topbar-actions">
+      <a id="btnBackToDonar" class="btn btn-secondary" href="./donar.html" style="text-align:center; display:inline-block; text-decoration:none;">Volver a Donar</a>
+      <button id="btnAssistantManager" class="btn btn-secondary" style="display:none;">Gestión de asistentes</button>
+      <button id="btnLogout" class="btn btn-secondary" style="display:none;">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="panelLogin" class="card login-box">
+      <h1>Ingreso asistente social</h1>
+      <p class="hint">Iniciá sesión para ver las donaciones cargadas y responder a cada donador.</p>
+
+      <label for="usuario">Usuario</label>
+      <input id="usuario" type="text" placeholder="Ej: asistente.social">
+
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" placeholder="Tu contraseña">
+
+      <button id="btnLogin" class="btn btn-primary" style="margin-top:14px; width:100%;">Iniciar sesión</button>
+      <div id="loginMsg"></div>
+    </div>
+
+    <div id="panelApp" class="card">
+      <div id="principalPanel" class="admin-panel" style="display:none;">
+        <h3>Gestión de asistentes (solo principal)</h3>
+        <p class="hint" style="margin:0 0 10px;">Desde acá podés crear asistentes secundarios para que también ingresen al panel.</p>
+        <div class="grid-2">
+          <div>
+            <label for="newAssistantUser">Nuevo usuario</label>
+            <input id="newAssistantUser" type="text" placeholder="Ej: asistente.2">
+          </div>
+          <div>
+            <label for="newAssistantName">Nombre completo</label>
+            <input id="newAssistantName" type="text" placeholder="Ej: Juan Perez">
+          </div>
+        </div>
+        <label for="newAssistantPass">Contraseña inicial</label>
+        <input id="newAssistantPass" type="password" placeholder="Contraseña para el asistente">
+        <button id="btnCreateAssistant" class="btn btn-primary" style="margin-top:12px;">Agregar asistente</button>
+        <div id="assistantCreateMsg"></div>
+
+        <div class="section-title" style="margin-top:18px;">Asistentes agregados</div>
+        <div id="assistantList" class="donation-list"></div>
+      </div>
+      <div id="donationsView">
+        <div class="toolbar">
+          <h2>Donaciones recibidas</h2>
+          <button id="btnRefresh" class="btn btn-secondary">Actualizar listado</button>
+        </div>
+        <div class="filters-row">
+          <input id="filterDateFrom" type="date" title="Fecha desde">
+          <input id="filterDateTo" type="date" title="Fecha hasta">
+          <select id="filterCategory" title="Filtrar por categoría">
+            <option value="">Todas las categorías</option>
+          </select>
+          <input id="filterNumber" type="text" placeholder="Nro de donación (ej: 002 o #002)" title="Buscar por número de donación">
+          <select id="sortBy" title="Ordenar resultados">
+            <option value="date_desc">Fecha: más reciente</option>
+            <option value="date_asc">Fecha: más antigua</option>
+            <option value="number_asc">Número: menor a mayor</option>
+            <option value="number_desc">Número: mayor a menor</option>
+          </select>
+        </div>
+        <div style="margin-bottom:8px;">
+          <button id="btnClearFilters" class="btn btn-secondary" type="button">Limpiar filtros</button>
+        </div>
+        <div class="tabs">
+          <button id="tabPending" class="tab-btn active" type="button">Pendientes</button>
+          <button id="tabDiscarded" class="tab-btn" type="button">Descartadas</button>
+        </div>
+        <div class="section-title" id="currentSectionTitle">Pendientes</div>
+        <div id="currentDonationList" class="donation-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./supabase-config.js"></script>
+  <script>
+    const SUPABASE_URL = window.SUPABASE_URL || "";
+    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
+    const SESSION_ASSISTANT_KEY = "manosConectadasAsistenteData";
+
+    const panelLogin = document.getElementById("panelLogin");
+    const panelApp = document.getElementById("panelApp");
+    const donationsView = document.getElementById("donationsView");
+    const btnLogout = document.getElementById("btnLogout");
+    const btnAssistantManager = document.getElementById("btnAssistantManager");
+    const loginMsg = document.getElementById("loginMsg");
+    const principalPanel = document.getElementById("principalPanel");
+    const assistantCreateMsg = document.getElementById("assistantCreateMsg");
+    const newAssistantUser = document.getElementById("newAssistantUser");
+    const newAssistantName = document.getElementById("newAssistantName");
+    const newAssistantPass = document.getElementById("newAssistantPass");
+    const btnCreateAssistant = document.getElementById("btnCreateAssistant");
+    const assistantList = document.getElementById("assistantList");
+    const currentDonationList = document.getElementById("currentDonationList");
+    const currentSectionTitle = document.getElementById("currentSectionTitle");
+    const filterDateFrom = document.getElementById("filterDateFrom");
+    const filterDateTo = document.getElementById("filterDateTo");
+    const filterCategory = document.getElementById("filterCategory");
+    const filterNumber = document.getElementById("filterNumber");
+    const sortBy = document.getElementById("sortBy");
+    const btnClearFilters = document.getElementById("btnClearFilters");
+    const tabPending = document.getElementById("tabPending");
+    const tabDiscarded = document.getElementById("tabDiscarded");
+    const toastEl = document.getElementById("toast");
+    const toastTitleEl = document.getElementById("toastTitle");
+    const toastMsgEl = document.getElementById("toastMsg");
+    let activeTab = "pending";
+    let cachedDonations = [];
+    let currentAssistant = null;
+    let activeAppView = "donations";
+    let toastTimer = null;
+
+    function showToast(message, type = "ok", title = "Ingreso correcto", durationMs = 3000) {
+      if (!toastEl) return;
+      if (toastTimer) window.clearTimeout(toastTimer);
+      toastEl.className = `toast visible ${type}`;
+      toastTitleEl.textContent = title;
+      toastMsgEl.textContent = message;
+      toastTimer = window.setTimeout(() => {
+        toastEl.classList.remove("visible");
+      }, durationMs);
+    }
+
+    async function fetchDonations() {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/donations?select=*&order=sequence.desc`, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error("No se pudieron obtener las donaciones.");
+      }
+      const rows = await response.json();
+      return rows.map((row) => ({
+        id: row.id,
+        sequence: row.sequence,
+        code: row.code,
+        createdAt: row.created_at,
+        donor: row.donor || {},
+        donation: row.donation || {},
+        coordination: row.coordination || {},
+        photos: row.photos || [],
+        response: row.response || null,
+        status: row.status || "pending"
+      }));
+    }
+
+    async function patchDonation(id, payload) {
+      const updatePayload = {};
+      if (Object.prototype.hasOwnProperty.call(payload, "status")) updatePayload.status = payload.status;
+      if (Object.prototype.hasOwnProperty.call(payload, "response")) updatePayload.response = payload.response;
+
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/donations?id=eq.${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: "return=representation"
+        },
+        body: JSON.stringify(updatePayload)
+      });
+      if (!response.ok) {
+        throw new Error("No se pudo actualizar la donación.");
+      }
+      const rows = await response.json();
+      return rows[0];
+    }
+
+    async function authenticateAssistant(username, password) {
+      const query = new URLSearchParams({
+        select: "id,username,full_name,active,is_primary",
+        username: `eq.${username}`,
+        password: `eq.${password}`,
+        active: "eq.true",
+        limit: "1"
+      });
+
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/assistants?${query.toString()}`, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error("No se pudo validar el asistente.");
+      }
+      const rows = await response.json();
+      return rows[0] || null;
+    }
+
+    function normalizeAssistantRole(assistant) {
+      if (!assistant) return null;
+      return {
+        ...assistant,
+        is_primary: !!assistant.is_primary || assistant.username === "asistente.social"
+      };
+    }
+
+    async function createAssistant({ username, password, fullName }) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/assistants`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: "return=representation"
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          full_name: fullName,
+          active: true,
+          is_primary: false
+        })
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        if (text.includes("duplicate key")) {
+          throw new Error("Ese usuario ya existe.");
+        }
+        throw new Error("No se pudo crear el asistente.");
+      }
+      const rows = await response.json();
+      return rows[0];
+    }
+
+    async function fetchAssistants() {
+      const query = new URLSearchParams({
+        select: "id,username,full_name,active,is_primary",
+        order: "is_primary.desc,username.asc"
+      });
+
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/assistants?${query.toString()}`, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error("No se pudieron obtener los asistentes.");
+      }
+      return await response.json();
+    }
+
+    async function patchAssistant(id, payload) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/assistants?id=eq.${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: "return=representation"
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        throw new Error("No se pudo actualizar el asistente.");
+      }
+      const rows = await response.json();
+      return rows[0];
+    }
+
+    async function deleteAssistant(id) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/assistants?id=eq.${id}`, {
+        method: "DELETE",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: "return=representation"
+        }
+      });
+      if (!response.ok) {
+        throw new Error("No se pudo eliminar el asistente.");
+      }
+      return true;
+    }
+
+    async function renderAssistants() {
+      if (!assistantList) return;
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes("TU-PROYECTO")) {
+        assistantList.innerHTML = '<div class="empty">Configurá supabase-config.js con tu URL y anon key.</div>';
+        return;
+      }
+      assistantList.innerHTML = '<div class="empty">Cargando asistentes...</div>';
+
+      let assistants = [];
+      try {
+        assistants = await fetchAssistants();
+      } catch {
+        assistantList.innerHTML = '<div class="empty">No se pudo conectar con el servidor.</div>';
+        return;
+      }
+
+      if (!assistants.length) {
+        assistantList.innerHTML = '<div class="empty">Todavía no hay asistentes cargados.</div>';
+        return;
+      }
+
+      assistantList.innerHTML = "";
+      assistants.forEach((a) => {
+        const row = document.createElement("article");
+        row.className = "donation-item";
+        const isPrimary = !!a.is_primary || a.username === "asistente.social";
+        const isSelf = Number(currentAssistant?.id) === Number(a.id);
+        const isActive = (a.active ?? true) ? true : false;
+        const canManage = !isPrimary && !isSelf;
+
+        row.innerHTML = `
+          <div class="meta">
+            <span>${isPrimary ? "Principal" : "Secundario"}</span>
+            <strong>${isActive ? "Activo" : "Inactivo"}</strong>
+          </div>
+          <h3 style="margin-bottom:6px;">${a.full_name || "Sin nombre"}</h3>
+          <div style="font-size:13px; line-height:1.45;">
+            <strong>Usuario:</strong> ${a.username || "—"}
+          </div>
+          ${
+            canManage
+              ? `<div class="inline-actions" style="margin-top:10px;">
+                  <button class="btn btn-secondary" data-toggle-active="${a.id}" data-next-active="${isActive ? "0" : "1"}">
+                    ${isActive ? "Desactivar" : "Activar"}
+                  </button>
+                  <button class="btn btn-danger" data-delete-assistant="${a.id}">Eliminar</button>
+                </div>`
+              : `<div style="margin-top:10px; font-size:12px; color:var(--muted);">
+                  ${isSelf ? "Este es tu usuario en sesión." : "No se puede modificar el asistente principal."}
+                </div>`
+          }
+        `;
+        assistantList.appendChild(row);
+      });
+
+      document.querySelectorAll("[data-toggle-active]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          if (!currentAssistant?.is_primary) return;
+          const id = Number(btn.getAttribute("data-toggle-active"));
+          const nextActive = btn.getAttribute("data-next-active") === "1";
+          const label = nextActive ? "activar" : "desactivar";
+          if (!confirm(`¿Seguro que querés ${label} este asistente?`)) return;
+          try {
+            await patchAssistant(id, { active: nextActive });
+            showToast(`Asistente ${nextActive ? "activado" : "desactivado"}.`, "ok", "Actualizado", 2500);
+            renderAssistants();
+          } catch (error) {
+            alert(error.message || "No se pudo actualizar el asistente.");
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-delete-assistant]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          if (!currentAssistant?.is_primary) return;
+          const id = Number(btn.getAttribute("data-delete-assistant"));
+          if (!confirm("¿Seguro que querés eliminar este asistente? Esta acción no se puede deshacer.")) return;
+          try {
+            await deleteAssistant(id);
+            showToast("Asistente eliminado.", "ok", "Eliminado", 2500);
+            renderAssistants();
+          } catch (error) {
+            alert(error.message || "No se pudo eliminar el asistente.");
+          }
+        });
+      });
+    }
+
+    function getDonationItems(item) {
+      if (Array.isArray(item.donation?.items) && item.donation.items.length) {
+        return item.donation.items;
+      }
+      return [{
+        categoria: item.donation?.categoria || "No informada",
+        objeto: item.donation?.objeto || "Objeto sin nombre",
+        estado: item.donation?.estado || "Sin estado",
+        cantidad: item.donation?.cantidad || "No informada"
+      }];
+    }
+
+    function getDonationNumber(item, index) {
+      const seq = Number(item.sequence || 0);
+      return Number.isFinite(seq) && seq > 0 ? seq : index + 1;
+    }
+
+    function getIsoDateOnly(isoDate) {
+      if (!isoDate) return "";
+      const date = new Date(isoDate);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toISOString().slice(0, 10);
+    }
+
+    function populateCategoryFilter(donations) {
+      const current = filterCategory.value;
+      const categories = Array.from(new Set(
+        donations.flatMap((item) => getDonationItems(item).map((d) => (d.categoria || "").trim()).filter(Boolean))
+      )).sort((a, b) => a.localeCompare(b, "es"));
+      filterCategory.innerHTML = '<option value="">Todas las categorías</option>' +
+        categories.map((cat) => `<option value="${cat}">${cat}</option>`).join("");
+      filterCategory.value = categories.includes(current) ? current : "";
+    }
+
+    function getFilteredDonations(donations) {
+      const from = filterDateFrom.value;
+      const to = filterDateTo.value;
+      const category = filterCategory.value.trim().toLowerCase();
+      const numberQuery = filterNumber.value.trim().replace("#", "");
+      const filtered = donations.filter((item, index) => {
+        const donationDate = getIsoDateOnly(item.createdAt);
+        if (from && donationDate && donationDate < from) return false;
+        if (to && donationDate && donationDate > to) return false;
+
+        if (category) {
+          const hasCategory = getDonationItems(item).some((d) => (d.categoria || "").trim().toLowerCase() === category);
+          if (!hasCategory) return false;
+        }
+
+        if (numberQuery) {
+          const number = String(getDonationNumber(item, index)).padStart(3, "0");
+          if (!number.includes(numberQuery) && !String(Number(number)).includes(numberQuery)) return false;
+        }
+
+        return true;
+      });
+
+      const withIndex = filtered.map((item) => ({ item, originalIndex: donations.indexOf(item) }));
+      withIndex.sort((a, b) => {
+        const dateA = new Date(a.item.createdAt || 0).getTime();
+        const dateB = new Date(b.item.createdAt || 0).getTime();
+        const numA = getDonationNumber(a.item, a.originalIndex);
+        const numB = getDonationNumber(b.item, b.originalIndex);
+
+        switch (sortBy.value) {
+          case "date_asc":
+            return dateA - dateB;
+          case "number_asc":
+            return numA - numB;
+          case "number_desc":
+            return numB - numA;
+          case "date_desc":
+          default:
+            return dateB - dateA;
+        }
+      });
+
+      return withIndex.map((entry) => entry.item);
+    }
+
+    function formatDate(isoDate) {
+      const date = new Date(isoDate);
+      if (Number.isNaN(date.getTime())) return "Sin fecha";
+      return date.toLocaleString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function showLoginError(message) {
+      loginMsg.className = "error";
+      loginMsg.textContent = message;
+    }
+
+    async function renderDonations() {
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes("TU-PROYECTO")) {
+        currentDonationList.innerHTML = '<div class="empty">Configurá supabase-config.js con tu URL y anon key.</div>';
+        return;
+      }
+      let donations = [];
+      try {
+        donations = await fetchDonations();
+      } catch (error) {
+        currentDonationList.innerHTML = '<div class="empty">No se pudo conectar con el servidor.</div>';
+        return;
+      }
+      cachedDonations = donations;
+      currentDonationList.innerHTML = "";
+      currentSectionTitle.textContent = activeTab === "discarded" ? "Descartadas" : "Pendientes";
+
+      if (!donations.length) {
+        currentDonationList.innerHTML = '<div class="empty">Todavía no hay donaciones cargadas desde el formulario principal.</div>';
+        return;
+      }
+
+      populateCategoryFilter(donations);
+      const filteredDonations = getFilteredDonations(donations);
+
+      let visibleCount = 0;
+
+      filteredDonations.forEach((item, index) => {
+        const donationId = item.id;
+        const donorName = (item.donor?.nombre || "") + " " + (item.donor?.apellido || "");
+        const responseText = item.response?.message || "";
+        const responseDate = item.response?.date ? formatDate(item.response.date) : "";
+        const donationItems = getDonationItems(item);
+        const donationNumber = getDonationNumber(item, donations.indexOf(item));
+        const extraItems = donationItems.length > 1 ? ` <span class="pill">+${donationItems.length - 1} más</span>` : "";
+        const photoList = Array.isArray(item.photos) ? item.photos.filter(Boolean).slice(0, 3) : [];
+        const photosHtml = photoList.length
+          ? `<div class="photo-list">${photoList.map((src, i) => `<img src="${src}" alt="Foto donación ${i + 1}">`).join("")}</div>`
+          : "";
+        const itemsHtml = donationItems.map((d, i) => `
+          <div style="font-size:13px; line-height:1.45; margin-bottom:${i === donationItems.length - 1 ? "0" : "8px"};">
+            <strong>${i + 1}. ${d.objeto || "Objeto sin nombre"}</strong><br>
+            <strong>Categoría:</strong> ${d.categoria || "No informada"} ·
+            <strong>Estado:</strong> ${d.estado || "Sin estado"} ·
+            <strong>Cantidad:</strong> ${d.cantidad || "No informada"}
+          </div>
+        `).join("");
+
+        const article = document.createElement("article");
+        article.className = "donation-item";
+        article.innerHTML = `
+          <div class="meta">
+            <span>${formatDate(item.createdAt)}</span>
+            <strong>${item.code || "Sin código"}</strong>
+          </div>
+          <h3 style="margin-bottom:6px;">Donación #${String(donationNumber).padStart(3, "0")}${extraItems}</h3>
+          <div style="font-size:13px; margin-bottom:8px;">
+            <strong>Total de ítems:</strong> ${donationItems.length}
+          </div>
+          ${photosHtml}
+          <div style="margin-bottom:8px;">${itemsHtml}</div>
+          <div style="font-size:13px; line-height:1.45;">
+            <strong>Donador:</strong> ${donorName.trim() || "Sin nombre"}<br>
+            <strong>Email:</strong> ${item.donor?.email || "No informado"}<br>
+            <strong>Teléfono:</strong> ${item.donor?.telefono || "No informado"}<br>
+            <strong>Modalidad:</strong> ${item.coordination?.modalidad === "retiro" ? "Retiro a domicilio" : item.coordination?.modalidad === "llevar" ? "La lleva al Municipio" : "No informada"}
+          </div>
+          <div class="resp-box">
+            <label for="respuesta-${donationId}" style="margin-top:0;">Respuesta para el donador</label>
+            <textarea id="respuesta-${donationId}" placeholder="Escribí un mensaje de seguimiento o coordinación...">${responseText}</textarea>
+            <div class="inline-actions">
+              <button class="btn btn-primary" data-save="${donationId}">Guardar respuesta</button>
+              ${responseText ? `<button class="btn btn-secondary" data-delete-response="${donationId}">Eliminar respuesta</button>` : ""}
+              ${item.status === "discarded"
+                ? `<button class="btn btn-secondary" data-restore="${donationId}">Restaurar a pendientes</button>`
+                : `<button class="btn btn-danger" data-discard="${donationId}">Descartar</button>`
+              }
+            </div>
+            ${responseText ? `<div class="resp-history"><strong>Última respuesta:</strong> ${responseText}<br><small>Actualizada: ${responseDate}</small></div>` : ""}
+          </div>
+        `;
+        const isDiscarded = item.status === "discarded";
+        if ((activeTab === "discarded" && isDiscarded) || (activeTab === "pending" && !isDiscarded)) {
+          currentDonationList.appendChild(article);
+          visibleCount += 1;
+        }
+      });
+
+      if (!visibleCount) {
+        currentDonationList.innerHTML = `<div class="empty">${
+          filteredDonations.length
+            ? (activeTab === "discarded" ? "No hay donaciones descartadas." : "No hay donaciones pendientes.")
+            : "No hay resultados con esos filtros."
+        }</div>`;
+      }
+
+      document.querySelectorAll("[data-save]").forEach((btn) => {
+        btn.addEventListener("click", () => saveResponse(Number(btn.getAttribute("data-save"))));
+      });
+      document.querySelectorAll("[data-delete-response]").forEach((btn) => {
+        btn.addEventListener("click", () => deleteResponse(Number(btn.getAttribute("data-delete-response"))));
+      });
+      document.querySelectorAll("[data-discard]").forEach((btn) => {
+        btn.addEventListener("click", () => changeDonationStatus(Number(btn.getAttribute("data-discard")), "discarded"));
+      });
+      document.querySelectorAll("[data-restore]").forEach((btn) => {
+        btn.addEventListener("click", () => changeDonationStatus(Number(btn.getAttribute("data-restore")), "pending"));
+      });
+    }
+
+    async function saveResponse(donationId) {
+      const input = document.getElementById(`respuesta-${donationId}`);
+      const message = input.value.trim();
+
+      if (!message) {
+        alert("Escribí una respuesta antes de guardar.");
+        return;
+      }
+
+      try {
+        await patchDonation(donationId, {
+          response: {
+            message,
+            date: new Date().toISOString()
+          }
+        });
+        renderDonations();
+      } catch (error) {
+        alert("No se pudo guardar la respuesta.");
+      }
+    }
+
+    async function changeDonationStatus(donationId, status) {
+      const donation = cachedDonations.find((item) => item.id === donationId);
+      if (!donation) return;
+      try {
+        await patchDonation(donationId, {
+          status,
+          response: donation.response || null
+        });
+        renderDonations();
+      } catch (error) {
+        alert("No se pudo actualizar el estado.");
+      }
+    }
+
+    async function deleteResponse(donationId) {
+      const donation = cachedDonations.find((item) => item.id === donationId);
+      if (!donation) return;
+      try {
+        await patchDonation(donationId, {
+          status: donation.status || "pending",
+          response: null
+        });
+        renderDonations();
+      } catch (error) {
+        alert("No se pudo eliminar la respuesta.");
+      }
+    }
+
+    function setupFilters() {
+      [filterDateFrom, filterDateTo, filterCategory, filterNumber, sortBy].forEach((el) => {
+        el.addEventListener("input", renderDonations);
+        el.addEventListener("change", renderDonations);
+      });
+      btnClearFilters.addEventListener("click", () => {
+        filterDateFrom.value = "";
+        filterDateTo.value = "";
+        filterCategory.value = "";
+        filterNumber.value = "";
+        sortBy.value = "date_desc";
+        renderDonations();
+      });
+    }
+
+    function setActiveTab(tab) {
+      activeTab = tab;
+      tabPending.classList.toggle("active", tab === "pending");
+      tabDiscarded.classList.toggle("active", tab === "discarded");
+      renderDonations();
+    }
+
+    function setSession(assistant) {
+      if (!assistant) {
+        localStorage.removeItem(SESSION_ASSISTANT_KEY);
+        currentAssistant = null;
+        return;
+      }
+      const normalizedAssistant = normalizeAssistantRole(assistant);
+      const data = {
+        id: normalizedAssistant.id,
+        username: normalizedAssistant.username,
+        full_name: normalizedAssistant.full_name || "",
+        is_primary: !!normalizedAssistant.is_primary
+      };
+      currentAssistant = data;
+      localStorage.setItem(SESSION_ASSISTANT_KEY, JSON.stringify(data));
+    }
+
+    function getSessionAssistant() {
+      const raw = localStorage.getItem(SESSION_ASSISTANT_KEY);
+      if (!raw) return null;
+      try {
+        return normalizeAssistantRole(JSON.parse(raw));
+      } catch {
+        return null;
+      }
+    }
+
+    function updatePrincipalPanelVisibility() {
+      const isPrincipal = !!currentAssistant?.is_primary;
+      btnAssistantManager.style.display = isPrincipal ? "inline-block" : "none";
+      if (!isPrincipal) {
+        activeAppView = "donations";
+      }
+      principalPanel.style.display = isPrincipal && activeAppView === "assistants" ? "block" : "none";
+      donationsView.style.display = activeAppView === "donations" ? "block" : "none";
+      btnAssistantManager.textContent = activeAppView === "assistants" ? "Ver donaciones" : "Gestión de asistentes";
+    }
+
+    function setAppView(view) {
+      activeAppView = view;
+      updatePrincipalPanelVisibility();
+      if (view === "donations") {
+        renderDonations();
+      }
+      if (view === "assistants") {
+        renderAssistants();
+      }
+    }
+
+    function showAssistantCreateMessage(type, message) {
+      assistantCreateMsg.className = type;
+      assistantCreateMsg.textContent = message;
+    }
+
+    function showApp() {
+      panelLogin.style.display = "none";
+      panelApp.style.display = "block";
+      btnLogout.style.display = "inline-block";
+      activeAppView = "donations";
+      updatePrincipalPanelVisibility();
+      renderDonations();
+    }
+
+    function showLogin() {
+      panelLogin.style.display = "block";
+      panelApp.style.display = "none";
+      btnLogout.style.display = "none";
+      btnAssistantManager.style.display = "none";
+    }
+
+    document.getElementById("btnLogin").addEventListener("click", () => {
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes("TU-PROYECTO")) {
+        showLoginError("Configurá supabase-config.js antes de iniciar sesión.");
+        return;
+      }
+
+      const user = document.getElementById("usuario").value.trim();
+      const pass = document.getElementById("clave").value.trim();
+
+      authenticateAssistant(user, pass)
+        .then((assistant) => {
+          if (!assistant) {
+            showLoginError("Usuario o contraseña incorrectos.");
+            return;
+          }
+          const normalizedAssistant = normalizeAssistantRole(assistant);
+          setSession(normalizedAssistant);
+          loginMsg.className = "";
+          loginMsg.textContent = "";
+          showApp();
+          showToast(`Bienvenido/a ${normalizedAssistant.full_name || normalizedAssistant.username}.`, "ok", "Ingreso correcto", 3000);
+        })
+        .catch(() => {
+          showLoginError("No se pudo validar el acceso en Supabase.");
+        });
+    });
+
+    document.getElementById("btnRefresh").addEventListener("click", renderDonations);
+    setupFilters();
+    tabPending.addEventListener("click", () => setActiveTab("pending"));
+    tabDiscarded.addEventListener("click", () => setActiveTab("discarded"));
+
+    btnLogout.addEventListener("click", () => {
+      setSession(null);
+      document.getElementById("usuario").value = "";
+      document.getElementById("clave").value = "";
+      showLogin();
+    });
+
+    btnCreateAssistant.addEventListener("click", () => {
+      if (!currentAssistant?.is_primary) {
+        showAssistantCreateMessage("error", "Solo el asistente principal puede crear asistentes.");
+        return;
+      }
+      const username = newAssistantUser.value.trim();
+      const fullName = newAssistantName.value.trim();
+      const password = newAssistantPass.value.trim();
+
+      if (!username || !password) {
+        showAssistantCreateMessage("error", "Completá usuario y contraseña.");
+        return;
+      }
+
+      createAssistant({ username, password, fullName })
+        .then(() => {
+          showAssistantCreateMessage("ok", "Asistente creado correctamente.");
+          newAssistantUser.value = "";
+          newAssistantName.value = "";
+          newAssistantPass.value = "";
+          renderAssistants();
+        })
+        .catch((error) => {
+          showAssistantCreateMessage("error", error.message || "No se pudo crear el asistente.");
+        });
+    });
+
+    btnAssistantManager.addEventListener("click", () => {
+      if (!currentAssistant?.is_primary) return;
+      setAppView(activeAppView === "assistants" ? "donations" : "assistants");
+    });
+
+    const savedAssistant = getSessionAssistant();
+    if (savedAssistant) {
+      currentAssistant = savedAssistant;
+      showApp();
+    } else {
+      showLogin();
+    }
+  </script>
+</body>
+</html>

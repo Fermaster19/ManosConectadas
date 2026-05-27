@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manos Conectadas — Donar</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F4EF;
+  --white: #FFFFFF;
+  --forest: #1D4B35;
+  --forest-mid: #2E6B4F;
+  --forest-light: #4A9970;
+  --sand: #E8DFD0;
+  --sand-dark: #D4C8B4;
+  --terracotta: #B85C38;
+  --terracotta-light: #D4795A;
+  --ink: #1A1915;
+  --ink-60: rgba(26,25,21,0.6);
+  --ink-30: rgba(26,25,21,0.3);
+  --ink-10: rgba(26,25,21,0.08);
+  --success: #2E7D52;
+  --radius: 12px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(247,244,239,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--sand-dark);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--forest);
+}
+.nav-logo span { color: var(--terracotta); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-60);
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--ink); }
+
+.nav-cta {
+  background: var(--forest);
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600 !important;
+}
+
+/* HERO STRIP */
+.hero-strip {
+  background: var(--forest);
+  margin-top: 64px;
+  padding: 80px 40px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: end;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 90% at 80% 60%, rgba(74,153,112,0.18) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-text-wrap {
+  padding-bottom: 60px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+
+.hero-eyebrow span {
+  width: 24px; height: 1px;
+  background: rgba(255,255,255,0.4);
+}
+
+.hero-h1 {
+  font-family: 'Lora', serif;
+  font-size: clamp(40px, 4.5vw, 60px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.hero-h1 em {
+  font-style: italic;
+  color: rgba(255,255,255,0.55);
+}
+
+.hero-sub {
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.6);
+  font-weight: 300;
+  max-width: 460px;
+}
+
+/* Stats row inside hero */
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+.hstat-num {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #fff;
+}
+.hstat-lbl {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* Hero illustration panel */
+.hero-illustration {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.floating-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 320px;
+  padding-bottom: 0;
+  animation: floatUp 0.8s ease-out both;
+}
+
+@keyframes floatUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fcard {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  backdrop-filter: blur(8px);
+  animation: floatUp 0.8s ease-out both;
+}
+.fcard:nth-child(1) { animation-delay: 0.1s; }
+.fcard:nth-child(2) { animation-delay: 0.2s; transform: translateX(20px); }
+.fcard:nth-child(2):not(:hover) { transform: translateX(20px); }
+.fcard:nth-child(3) { animation-delay: 0.3s; }
+
+.fcard-icon {
+  width: 42px; height: 42px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.fcard:nth-child(1) .fcard-icon { background: rgba(184,92,56,0.25); }
+.fcard:nth-child(2) .fcard-icon { background: rgba(74,153,112,0.3); }
+.fcard:nth-child(3) .fcard-icon { background: rgba(200,148,26,0.25); }
+
+.fcard-text { flex: 1; }
+.fcard-title { font-size: 13px; font-weight: 600; color: #fff; }
+.fcard-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+.fcard-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.badge-new { background: rgba(74,153,112,0.3); color: #7DCCA0; }
+.badge-ok { background: rgba(200,148,26,0.25); color: #F0C060; }
+
+/* WAVE DIVIDER */
+.wave {
+  height: 48px;
+  background: var(--forest);
+  clip-path: ellipse(55% 100% at 50% 0%);
+}
+
+/* MAIN CONTENT */
+.main-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 40px 120px;
+}
+
+/* STEP INDICATOR */
+.steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 64px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+}
+
+.step-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s;
+  border: 2px solid var(--sand-dark);
+  color: var(--ink-30);
+  background: var(--white);
+}
+
+.step-item.active .step-circle {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: white;
+}
+
+.step-item.done .step-circle {
+  background: var(--forest-light);
+  border-color: var(--forest-light);
+  color: white;
+}
+
+.step-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-30);
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.step-item.active .step-label { color: var(--forest); font-weight: 600; }
+.step-item.done .step-label { color: var(--forest-light); }
+
+.step-connector {
+  width: 60px;
+  height: 2px;
+  background: var(--sand-dark);
+  margin: 0 4px;
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+.step-connector.done { background: var(--forest-light); }
+
+/* CARD PANELS */
+.form-panel {
+  display: none;
+  animation: fadeIn 0.4s ease-out;
+}
+.form-panel.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+  margin-bottom: 40px;
+}
+
+.panel-step-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--forest-mid);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-step-tag::before {
+  content: '';
+  width: 20px; height: 2px;
+  background: var(--forest-mid);
+}
+
+.panel-title {
+  font-family: 'Lora', serif;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.panel-desc {
+  font-size: 15px;
+  color: var(--ink-60);
+  line-height: 1.7;
+  max-width: 560px;
+  font-weight: 300;
+}
+
+/* FORM LAYOUT */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-grid.single { grid-template-columns: 1fr; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field.full { grid-column: 1 / -1; }
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+
+label .req { color: var(--terracotta); margin-left: 3px; }
+label .opt { color: var(--ink-30); font-weight: 400; font-size: 11px; margin-left: 4px; }
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+select, textarea {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--sand-dark);
+  border-radius: 8px;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--forest-mid);
+  box-shadow: 0 0 0 3px rgba(46,107,79,0.12);
+}
+
+input.error, select.error, textarea.error {
+  border-color: var(--terracotta);
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--ink-30);
+  font-weight: 400;
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--terracotta);
+  font-weight: 500;
+  display: none;
+}
+
+.field-error.visible { display: block; }
+
+textarea { resize: vertical; min-height: 100px; }
+
+/* Category grid */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.cat-option {
+  border: 1.5px solid var(--sand-dark);
+  border-radius: 10px;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--white);
+  user-select: none;
+}
+
+.cat-option:hover {
+  border-color: var(--forest-mid);
+  background: rgba(46,107,79,0.04);
+}
+
+.cat-option.selected {
+  border-color: var(--forest);
+  background: rgba(29,75,53,0.06);
+  box-shadow: 0 0 0 3px rgba(29,75,53,0.1);
+}
+
+.cat-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.cat-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+
+/* Estado chips */
+.estado-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.estado-chip {
+  border: 1.5px solid var(--sand-dark);
+  border-radius: 6px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--white);
+  color: var(--ink-60);
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.estado-chip:hover { border-color: var(--forest-mid); color: var(--forest-mid); }
+.estado-chip.selected {
+  border-color: var(--forest);
+  background: var(--forest);
+  color: white;
+}
+
+.multi-donation-box {
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.multi-donation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.multi-donation-head strong {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.mini-btn {
+  border: 1px solid var(--forest-mid);
+  background: rgba(46,107,79,0.08);
+  color: var(--forest);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mini-btn:hover {
+  background: rgba(46,107,79,0.14);
+}
+
+.mini-btn.remove {
+  border-color: rgba(184,92,56,0.4);
+  color: var(--terracotta);
+  background: rgba(184,92,56,0.07);
+}
+
+.mini-btn.remove:hover {
+  background: rgba(184,92,56,0.12);
+}
+
+.donation-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.donation-item-card {
+  border: 1px solid var(--sand);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.donation-item-main {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.donation-item-main small {
+  display: block;
+  color: var(--ink-60);
+}
+
+/* Photo upload */
+.photo-upload {
+  border: 2px dashed var(--sand-dark);
+  border-radius: 10px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--white);
+  position: relative;
+}
+
+.photo-upload:hover { border-color: var(--forest-mid); background: rgba(46,107,79,0.03); }
+.photo-upload.has-file { border-style: solid; border-color: var(--forest-light); background: rgba(74,153,112,0.06); }
+
+.photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.upload-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+.upload-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.upload-hint { font-size: 13px; color: var(--ink-30); }
+
+.photo-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.photo-thumb {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background: var(--sand);
+}
+
+.photo-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.photo-thumb .remove-btn {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.photo-thumb .remove-btn:hover { background: var(--terracotta); }
+
+/* Ubicación radio */
+.ubicacion-opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ubic-opt {
+  border: 1.5px solid var(--sand-dark);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--white);
+  user-select: none;
+}
+.ubic-opt:hover { border-color: var(--forest-mid); }
+.ubic-opt.selected { border-color: var(--forest); background: rgba(29,75,53,0.05); }
+
+.ubic-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+.ubic-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.ubic-desc { font-size: 12px; color: var(--ink-60); line-height: 1.5; }
+
+/* RESUMEN */
+.summary-card {
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.summary-section {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--sand);
+}
+.summary-section:last-child { border-bottom: none; }
+
+.summary-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  margin-bottom: 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sand);
+}
+.summary-row:last-child { border-bottom: none; }
+
+.summary-key { font-size: 13px; color: var(--ink-60); }
+.summary-val { font-size: 13px; font-weight: 600; color: var(--ink); text-align: right; max-width: 60%; }
+
+.terms-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  background: rgba(29,75,53,0.04);
+  border: 1px solid rgba(29,75,53,0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.terms-check input[type="checkbox"] {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--forest);
+  cursor: pointer;
+  margin-top: 1px;
+}
+
+.terms-text { font-size: 13px; color: var(--ink-60); line-height: 1.6; }
+.terms-text a { color: var(--forest-mid); text-decoration: underline; }
+
+/* BUTTONS */
+.btn-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 40px;
+  justify-content: space-between;
+}
+
+.btn-back {
+  background: none;
+  border: 1.5px solid var(--sand-dark);
+  color: var(--ink-60);
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-back:hover { border-color: var(--ink-60); color: var(--ink); }
+
+.btn-next {
+  background: var(--forest);
+  color: white;
+  border: none;
+  padding: 14px 36px;
+  border-radius: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 4px 16px rgba(29,75,53,0.25);
+}
+.btn-next:hover {
+  background: var(--forest-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(29,75,53,0.3);
+}
+.btn-next:active { transform: translateY(0); }
+
+.btn-next.submit {
+  background: var(--terracotta);
+  box-shadow: 0 4px 16px rgba(184,92,56,0.3);
+}
+.btn-next.submit:hover {
+  background: var(--terracotta-light);
+  box-shadow: 0 6px 20px rgba(184,92,56,0.35);
+}
+
+/* SIDEBAR */
+.page-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-card {
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.sidebar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-title span { font-size: 16px; }
+
+.sidebar-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ss-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ss-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--sand);
+  color: var(--ink-30);
+  transition: all 0.3s;
+}
+
+.ss-item.done .ss-dot { background: var(--forest-light); color: white; }
+.ss-item.active .ss-dot { background: var(--forest); color: white; }
+
+.ss-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+} 
+.ss-name { font-size: 13px; font-weight: 600; color: var(--ink-30); transition: color 0.3s; }
+.ss-item.active .ss-name { color: var(--forest); }
+.ss-item.done .ss-name { color: var(--ink-60); }
+.ss-sub { font-size: 11px; color: var(--ink-30); margin-top: 2px; }
+
+.help-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--sand);
+  margin-bottom: 14px;
+}
+.help-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.help-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+.help-text { font-size: 12px; color: var(--ink-60); line-height: 1.6; }
+.help-text strong { color: var(--ink); font-weight: 600; }
+
+/* SUCCESS SCREEN */
+.success-screen {
+  display: none;
+  text-align: center;
+  padding: 80px 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.success-screen.visible { display: block; }
+
+.success-anim {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(29,75,53,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin: 0 auto 32px;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.success-title {
+  font-family: 'Lora', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 16px;
+}
+
+.success-desc {
+  font-size: 16px;
+  color: var(--ink-60);
+  line-height: 1.75;
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+
+.success-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--sand);
+  border: 1px solid var(--sand-dark);
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-family: 'Lora', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 40px;
+}
+
+.success-next-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.sns-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--ink-60);
+  line-height: 1.6;
+}
+
+.sns-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.btn-nueva {
+  background: var(--forest);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-nueva:hover { background: var(--forest-mid); transform: translateY(-1px); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-strip { grid-template-columns: 1fr; padding: 60px 20px 0; }
+  .hero-illustration { display: none; }
+  .main-wrap { padding: 60px 20px 80px; }
+  .page-layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .ubicacion-opts { grid-template-columns: 1fr; }
+  .steps-row { gap: 4px; }
+  .step-connector { width: 20px; }
+  .step-label { display: none; }
+  .photo-preview-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Manos<span> Conectadas</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Inicio</a></li>
+    <li><a href="#">¿Cómo funciona?</a></li>
+    <li><a href="#">Necesidades actuales</a></li>
+    <li><a href="asistente-social.html" class="nav-cta">Iniciar sesión</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero-strip">
+  <div class="hero-text-wrap">
+    <div class="hero-eyebrow"><span></span>Municipio de Villa del Rosario</div>
+    <h1 class="hero-h1">Tu donación<br>cambia<br><em>una historia real.</em></h1>
+    <p class="hero-sub">Cargá lo que querés donar en minutos. Nuestro equipo municipal se encarga de que llegue a quien más lo necesita.</p>
+    <div class="hero-stats">
+      <div>
+        <div class="hstat-num">312</div>
+        <div class="hstat-lbl">Familias ayudadas</div>
+      </div>
+      <div>
+        <div class="hstat-num">4.2d</div>
+        <div class="hstat-lbl">Tiempo promedio</div>
+      </div>
+      <div>
+        <div class="hstat-num">1.8k</div>
+        <div class="hstat-lbl">Donaciones entregadas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-illustration">
+    <div class="floating-cards">
+      <div class="fcard">
+        <div class="fcard-icon">👕</div>
+        <div class="fcard-text">
+          <div class="fcard-title">Ropa de abrigo</div>
+          <div class="fcard-sub">Cargada hace 2 horas</div>
+        </div>
+        <div class="fcard-badge badge-new">Nueva</div>
+      </div>
+      <div class="fcard" style="margin-left:20px;">
+        <div class="fcard-icon">🧠</div>
+        <div class="fcard-text">
+          <div class="fcard-title">IA sugirió asignación</div>
+          <div class="fcard-sub">Familia Rodríguez · Urgente</div>
+        </div>
+        <div class="fcard-badge badge-ok">Revisando</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon">📦</div>
+        <div class="fcard-text">
+          <div class="fcard-title">Alimentos no perecederos</div>
+          <div class="fcard-sub">Entregado ayer ✓</div>
+        </div>
+        <div class="fcard-badge badge-ok">Entregado</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wave"></div>
+
+<!-- MAIN -->
+<div class="main-wrap" id="mainWrap">
+
+  <!-- STEP INDICATOR -->
+  <div class="steps-row" id="stepsRow">
+    <div class="step-item active" id="step-ind-0">
+      <div class="step-circle">1</div>
+      <div class="step-label">Tus datos</div>
+    </div>
+    <div class="step-connector" id="conn-0"></div>
+    <div class="step-item" id="step-ind-1">
+      <div class="step-circle">2</div>
+      <div class="step-label">La donación</div>
+    </div>
+    <div class="step-connector" id="conn-1"></div>
+    <div class="step-item" id="step-ind-2">
+      <div class="step-circle">3</div>
+      <div class="step-label">Fotos y detalles</div>
+    </div>
+    <div class="step-connector" id="conn-2"></div>
+    <div class="step-item" id="step-ind-3">
+      <div class="step-circle">4</div>
+      <div class="step-label">Confirmación</div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <div class="form-main">
+
+      <!-- PANEL 0: Datos del donante -->
+      <div class="form-panel active" id="panel-0">
+        <div class="panel-header">
+          <div class="panel-step-tag">Paso 1 de 4</div>
+          <h2 class="panel-title">Contanos quién sos</h2>
+          <p class="panel-desc">Para coordinar la entrega necesitamos tus datos de contacto. Solo los verá el equipo municipal.</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Nombre <span class="req">*</span></label>
+            <input type="text" id="nombre" placeholder="María">
+            <span class="field-error" id="err-nombre">Por favor ingresá tu nombre.</span>
+          </div>
+          <div class="field">
+            <label>Apellido <span class="req">*</span></label>
+            <input type="text" id="apellido" placeholder="González">
+            <span class="field-error" id="err-apellido">Por favor ingresá tu apellido.</span>
+          </div>
+          <div class="field">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="maria@email.com">
+            <span class="field-hint">Te enviaremos el código de seguimiento de tu donación.</span>
+            <span class="field-error" id="err-email">Ingresá un email válido.</span>
+          </div>
+          <div class="field">
+            <label>Teléfono <span class="req">*</span></label>
+            <input type="tel" id="telefono" placeholder="3574 000000">
+            <span class="field-hint">Para coordinar el retiro o entrega.</span>
+            <span class="field-error" id="err-telefono">Ingresá un teléfono de contacto.</span>
+          </div>
+          <div class="field full">
+            <label>Tipo de donante</label>
+            <select id="tipo-donante">
+              <option value="">Seleccioná...</option>
+              <option value="persona">Persona física</option>
+              <option value="empresa">Empresa / Comercio</option>
+              <option value="institucion">Institución educativa</option>
+              <option value="iglesia">Iglesia / Organización religiosa</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <div></div>
+          <button class="btn-next" onclick="goNext(0)">
+            Siguiente <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL 1: La donación -->
+      <div class="form-panel" id="panel-1">
+        <div class="panel-header">
+          <div class="panel-step-tag">Paso 2 de 4</div>
+          <h2 class="panel-title">¿Qué querés donar?</h2>
+          <p class="panel-desc">Podés cargar una o varias donaciones en este mismo formulario. Agregá cada objeto y luego continuá al siguiente paso.</p>
+        </div>
+
+        <div style="margin-bottom:28px;">
+          <label style="margin-bottom:12px; display:block;">Categoría <span class="req">*</span></label>
+          <div class="cat-grid" id="catGrid">
+            <div class="cat-option" onclick="selectCat(this,'Ropa y calzado')">
+              <span class="cat-icon">👕</span>
+              <span class="cat-name">Ropa y calzado</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Alimentos')">
+              <span class="cat-icon">🥫</span>
+              <span class="cat-name">Alimentos</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Muebles y hogar')">
+              <span class="cat-icon">🛋️</span>
+              <span class="cat-name">Muebles y hogar</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Útiles escolares')">
+              <span class="cat-icon">✏️</span>
+              <span class="cat-name">Útiles escolares</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Juguetes')">
+              <span class="cat-icon">🧸</span>
+              <span class="cat-name">Juguetes</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Electrónica')">
+              <span class="cat-icon">💻</span>
+              <span class="cat-name">Electrónica</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Medicamentos')">
+              <span class="cat-icon">💊</span>
+              <span class="cat-name">Medicamentos</span>
+            </div>
+            <div class="cat-option" onclick="selectCat(this,'Otro')">
+              <span class="cat-icon">📦</span>
+              <span class="cat-name">Otro</span>
+            </div>
+          </div>
+          <span class="field-error" id="err-cat" style="display:none; margin-top:8px;">Seleccioná una categoría.</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="field full">
+            <label>Nombre del objeto <span class="req">*</span></label>
+            <input type="text" id="objeto" placeholder="Ej: Campera de nena talle 8">
+            <span class="field-error" id="err-objeto">Describí brevemente qué vas a donar.</span>
+          </div>
+          <div class="field full">
+            <label>Descripción <span class="opt">Opcional</span></label>
+            <textarea id="descripcion" placeholder="Contanos más detalles: medidas, color, marca, si viene con accesorios, etc."></textarea>
+          </div>
+          <div class="field">
+            <label>Cantidad</label>
+            <input type="text" id="cantidad" placeholder="Ej: 1 unidad / 3 pares / 1 bolsa">
+          </div>
+          <div class="field" id="vencimientoField" style="display:none;">
+            <label>Fecha de vencimiento <span class="req">*</span></label>
+            <input type="date" id="fecha-vencimiento">
+            <span class="field-hint">Solo para productos con vencimiento.</span>
+            <span class="field-error" id="err-vencimiento">Ingresá la fecha de vencimiento.</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:28px;">
+          <label style="margin-bottom:12px; display:block;">Estado del objeto <span class="req">*</span></label>
+          <div class="estado-group">
+            <div class="estado-chip" onclick="selectEstado(this,'Nuevo')">✨ Nuevo</div>
+            <div class="estado-chip" onclick="selectEstado(this,'Como nuevo')">🌟 Como nuevo</div>
+            <div class="estado-chip" onclick="selectEstado(this,'Buen estado')">👍 Buen estado</div>
+            <div class="estado-chip" onclick="selectEstado(this,'Usado')">🔄 Usado</div>
+            <div class="estado-chip" onclick="selectEstado(this,'Para reparar')">🔧 Para reparar</div>
+          </div>
+          <span class="field-error" id="err-estado">Indicá el estado del objeto.</span>
+        </div>
+
+        <div class="multi-donation-box">
+          <div class="multi-donation-head">
+            <strong>Donaciones agregadas: <span id="itemsCount">0</span></strong>
+            <button class="mini-btn" type="button" onclick="addDonationItem()">+ Agregar donación</button>
+          </div>
+          <div class="donation-item-list" id="donationItemList"></div>
+          <span class="field-hint">Primero completá los campos de arriba y después hacé clic en "Agregar donación".</span>
+          <span class="field-error" id="err-items" style="margin-top:8px;">Agregá al menos una donación para continuar.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack(1)">← Volver</button>
+          <button class="btn-next" onclick="goNext(1)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 2: Fotos y ubicación -->
+      <div class="form-panel" id="panel-2">
+        <div class="panel-header">
+          <div class="panel-step-tag">Paso 3 de 4</div>
+          <h2 class="panel-title">Fotos y coordinación</h2>
+          <p class="panel-desc">Una foto ayuda al equipo a evaluar la donación y asignarla mejor. También contanos cómo podemos retirar el objeto.</p>
+        </div>
+
+        <div style="margin-bottom:28px;">
+          <label style="margin-bottom:12px; display:block;">Fotos del objeto <span class="opt">Opcional pero recomendado</span></label>
+          <div class="photo-upload" id="dropzone">
+            <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(this)">
+            <span class="upload-icon">📷</span>
+            <div class="upload-title">Subí fotos del objeto</div>
+            <div class="upload-hint">Hacé clic o arrastrá las imágenes aquí · JPG, PNG hasta 10MB</div>
+          </div>
+          <div class="photo-preview-grid" id="photoPreview"></div>
+        </div>
+
+        <div style="margin-bottom:28px;">
+          <label style="margin-bottom:12px; display:block;">¿Cómo coordinamos la entrega? <span class="req">*</span></label>
+          <div class="ubicacion-opts">
+            <div class="ubic-opt" onclick="selectUbicacion(this,'retiro')">
+              <span class="ubic-icon">🚗</span>
+              <div class="ubic-title">Retiro a domicilio</div>
+              <div class="ubic-desc">El equipo municipal pasa a buscar la donación a tu dirección.</div>
+            </div>
+            <div class="ubic-opt" onclick="selectUbicacion(this,'llevar')">
+              <span class="ubic-icon">🏢</span>
+              <div class="ubic-title">La llevo yo</div>
+              <div class="ubic-desc">Te indicamos el punto de entrega en el Municipio, de Lunes a Viernes.</div>
+            </div>
+          </div>
+          <span class="field-error" id="err-ubic">Elegí cómo coordinamos la entrega.</span>
+        </div>
+
+        <div id="domicilioFields" style="display:none;">
+          <div class="form-grid">
+            <div class="field full">
+              <label>Dirección <span class="req">*</span></label>
+              <input type="text" id="direccion" placeholder="Ej: Rivadavia 450, Villa del Rosario">
+              <span class="field-error" id="err-direccion">Ingresá tu dirección para el retiro.</span>
+            </div>
+            <div class="field">
+              <label>Disponibilidad horaria <span class="opt">Opcional</span></label>
+              <input type="text" id="horario" placeholder="Ej: Tardes de 14 a 18hs">
+            </div>
+            <div class="field">
+              <label>Referencias <span class="opt">Opcional</span></label>
+              <input type="text" id="referencias" placeholder="Ej: Casa con reja verde">
+            </div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:24px;">
+          <label>¿Alguna preferencia de a quién donar? <span class="opt">Opcional</span></label>
+          <textarea id="preferencia" placeholder="Ej: Prefiero que sea para una familia con niños pequeños / una escuela primaria" style="min-height:80px;"></textarea>
+          <span class="field-hint">El equipo lo tendrá en cuenta, pero la asignación final la decidimos con criterio profesional.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack(2)">← Volver</button>
+          <button class="btn-next" onclick="goNext(2)">Revisar donación →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 3: Confirmación -->
+      <div class="form-panel" id="panel-3">
+        <div class="panel-header">
+          <div class="panel-step-tag">Paso 4 de 4</div>
+          <h2 class="panel-title">Revisá tu donación</h2>
+          <p class="panel-desc">Confirmá que todo esté bien antes de enviar. Podés volver a editar cualquier paso.</p>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-section">
+            <div class="summary-section-title">Tus datos</div>
+            <div class="summary-row">
+              <span class="summary-key">Nombre completo</span>
+              <span class="summary-val" id="sum-nombre">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Email</span>
+              <span class="summary-val" id="sum-email">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Teléfono</span>
+              <span class="summary-val" id="sum-telefono">—</span>
+            </div>
+          </div>
+          <div class="summary-section">
+            <div class="summary-section-title">La donación</div>
+            <div id="sum-donations-list"></div>
+          </div>
+          <div class="summary-section">
+            <div class="summary-section-title">Coordinación</div>
+            <div class="summary-row">
+              <span class="summary-key">Modalidad</span>
+              <span class="summary-val" id="sum-ubic">—</span>
+            </div>
+            <div class="summary-row" id="sum-dir-row" style="display:none;">
+              <span class="summary-key">Dirección</span>
+              <span class="summary-val" id="sum-dir">—</span>
+            </div>
+          </div>
+        </div>
+
+        <label class="terms-check">
+          <input type="checkbox" id="terms">
+          <span class="terms-text">
+            Confirmo que la información es correcta y que el objeto se encuentra en las condiciones indicadas.
+            Acepto los <a href="#">términos de uso</a> y la <a href="#">política de privacidad</a> de Manos Conectadas.
+          </span>
+        </label>
+        <span class="field-error" id="err-terms" style="margin-top:8px;">Necesitás aceptar los términos para continuar.</span>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack(3)">← Volver</button>
+          <button class="btn-next submit" onclick="submitForm()">
+            Enviar donación 💚
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title"><span>📋</span> Tu progreso</div>
+        <div class="sidebar-steps" id="sidebarSteps">
+          <div class="ss-item active" id="ss-0">
+            <div class="ss-dot">1</div>
+            <div class="ss-text">
+              <div class="ss-name">Tus datos</div>
+              <div class="ss-sub">Nombre, email, teléfono</div>
+            </div>
+          </div>
+          <div class="ss-item" id="ss-1">
+            <div class="ss-dot">2</div>
+            <div class="ss-text">
+              <div class="ss-name">La donación</div>
+              <div class="ss-sub">Categoría, objeto, estado</div>
+            </div>
+          </div>
+          <div class="ss-item" id="ss-2">
+            <div class="ss-dot">3</div>
+            <div class="ss-text">
+              <div class="ss-name">Fotos y entrega</div>
+              <div class="ss-sub">Fotos, dirección o punto</div>
+            </div>
+          </div>
+          <div class="ss-item" id="ss-3">
+            <div class="ss-dot">4</div>
+            <div class="ss-text">
+              <div class="ss-name">Confirmación</div>
+              <div class="ss-sub">Revisá y enviá</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title"><span>💡</span> ¿Cómo funciona?</div>
+        <div class="help-item">
+          <span class="help-icon">📥</span>
+          <div class="help-text"><strong>Cargás tu donación</strong> en este formulario (tarda 3 minutos).</div>
+        </div>
+        <div class="help-item">
+          <span class="help-icon">🧠</span>
+          <div class="help-text"><strong>El equipo evalúa</strong> tu donación con ayuda de inteligencia artificial.</div>
+        </div>
+        <div class="help-item">
+          <span class="help-icon">📞</span>
+          <div class="help-text"><strong>Te contactamos</strong> para coordinar el retiro o indicarte dónde llevarla.</div>
+        </div>
+        <div class="help-item">
+          <span class="help-icon">🏠</span>
+          <div class="help-text"><strong>La entregamos</strong> a la familia o institución que más la necesita.</div>
+        </div>
+      </div>
+
+      <div class="sidebar-card" style="background:rgba(29,75,53,0.06); border-color:rgba(29,75,53,0.2);">
+        <div class="sidebar-title" style="color:var(--forest);"><span>📞</span> ¿Necesitás ayuda?</div>
+        <p style="font-size:13px; color:var(--ink-60); line-height:1.6; margin-bottom:12px;">
+          Contactá al equipo municipal de lunes a viernes de 8 a 16hs.
+        </p>
+        <p style="font-size:14px; font-weight:600; color:var(--forest);">3574 000000</p>
+        <p style="font-size:13px; color:var(--ink-60); margin-top:4px;">donaciones@manosconectadas.gob.ar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-anim">🎉</div>
+    <h2 class="success-title">¡Muchas gracias!</h2>
+    <p class="success-desc">
+      Tu donación fue registrada exitosamente. El equipo de trabajo social del Municipio la va a revisar pronto y te va a contactar para coordinar.
+    </p>
+    <div class="success-code">
+      🔖 Código de seguimiento: <strong id="trackingCode">RS-2026-00000</strong>
+    </div>
+
+    <div class="success-next-steps">
+      <div class="sns-item">
+        <div class="sns-num">1</div>
+        <span>Te llegará un email de confirmación a la dirección que ingresaste.</span>
+      </div>
+      <div class="sns-item">
+        <div class="sns-num">2</div>
+        <span>En 24-48hs una asistente social te va a contactar por teléfono o WhatsApp.</span>
+      </div>
+      <div class="sns-item">
+        <div class="sns-num">3</div>
+        <span>Coordinaremos el retiro o te indicaremos el punto de entrega más conveniente.</span>
+      </div>
+      <div class="sns-item">
+        <div class="sns-num">4</div>
+        <span>Una vez entregada la donación, te avisaremos quién la recibió (de forma anónima).</span>
+      </div>
+    </div>
+
+    <button class="btn-nueva" onclick="location.reload()">Hacer otra donación →</button>
+  </div>
+
+</div>
+
+<script src="./supabase-config.js"></script>
+<script>
+let currentStep = 0;
+let selectedCat = '';
+let selectedEstado = '';
+let selectedUbicacion = '';
+let photos = [];
+let donationItems = [];
+const CATEGORIAS_CON_VENCIMIENTO = ['Alimentos', 'Medicamentos'];
+const SUPABASE_URL = window.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+
+function selectCat(el, cat) {
+  document.querySelectorAll('.cat-option').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = cat;
+  document.getElementById('err-cat').style.display = 'none';
+  toggleVencimientoField();
+}
+
+function selectEstado(el, estado) {
+  document.querySelectorAll('.estado-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEstado = estado;
+  document.getElementById('err-estado').style.display = 'none';
+}
+
+function getDonationDraft() {
+  return {
+    categoria: selectedCat || '',
+    objeto: document.getElementById('objeto').value.trim(),
+    descripcion: document.getElementById('descripcion').value.trim(),
+    cantidad: document.getElementById('cantidad').value.trim(),
+    estado: selectedEstado || '',
+    fechaVencimiento: document.getElementById('fecha-vencimiento').value || ''
+  };
+}
+
+function requiresVencimiento(categoria) {
+  return CATEGORIAS_CON_VENCIMIENTO.includes(categoria);
+}
+
+function toggleVencimientoField() {
+  const field = document.getElementById('vencimientoField');
+  const input = document.getElementById('fecha-vencimiento');
+  const err = document.getElementById('err-vencimiento');
+  if (requiresVencimiento(selectedCat)) {
+    field.style.display = 'flex';
+  } else {
+    field.style.display = 'none';
+    input.value = '';
+    input.classList.remove('error');
+    err.classList.remove('visible');
+  }
+}
+
+function clearDonationDraft() {
+  selectedCat = '';
+  selectedEstado = '';
+  document.querySelectorAll('.cat-option').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.estado-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('objeto').value = '';
+  document.getElementById('descripcion').value = '';
+  document.getElementById('cantidad').value = '';
+  document.getElementById('fecha-vencimiento').value = '';
+  document.getElementById('objeto').classList.remove('error');
+  document.getElementById('err-objeto').classList.remove('visible');
+  document.getElementById('err-cat').style.display = 'none';
+  document.getElementById('err-estado').classList.remove('visible');
+  document.getElementById('fecha-vencimiento').classList.remove('error');
+  document.getElementById('err-vencimiento').classList.remove('visible');
+  toggleVencimientoField();
+}
+
+function hasDraftDonationData() {
+  const draft = getDonationDraft();
+  return !!(draft.categoria || draft.objeto || draft.descripcion || draft.cantidad || draft.estado || draft.fechaVencimiento);
+}
+
+function addDonationItem() {
+  if (!validateStep1Fields()) return false;
+  donationItems.push(getDonationDraft());
+  renderDonationItems();
+  clearDonationDraft();
+  document.getElementById('err-items').classList.remove('visible');
+  return true;
+}
+
+function renderDonationItems() {
+  const list = document.getElementById('donationItemList');
+  const count = document.getElementById('itemsCount');
+  list.innerHTML = '';
+  count.textContent = String(donationItems.length);
+  donationItems.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'donation-item-card';
+    card.innerHTML = `
+      <div class="donation-item-main">
+        <strong>${idx + 1}. ${item.objeto}</strong>
+        <small>${item.categoria} · ${item.estado}${item.cantidad ? ` · ${item.cantidad}` : ''}${item.fechaVencimiento ? ` · Vence: ${item.fechaVencimiento}` : ''}</small>
+      </div>
+      <button type="button" class="mini-btn remove" onclick="removeDonationItem(${idx})">Quitar</button>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function removeDonationItem(idx) {
+  donationItems.splice(idx, 1);
+  renderDonationItems();
+}
+
+function validateStep1Fields() {
+  let ok = true;
+  if (!selectedCat) { document.getElementById('err-cat').style.display = 'block'; ok = false; }
+  const obj = document.getElementById('objeto');
+  const errObj = document.getElementById('err-objeto');
+  if (!obj.value.trim()) { obj.classList.add('error'); errObj.classList.add('visible'); ok = false; }
+  else { obj.classList.remove('error'); errObj.classList.remove('visible'); }
+  if (!selectedEstado) { document.getElementById('err-estado').classList.add('visible'); ok = false; }
+  else { document.getElementById('err-estado').classList.remove('visible'); }
+  const vencInput = document.getElementById('fecha-vencimiento');
+  const errVenc = document.getElementById('err-vencimiento');
+  if (requiresVencimiento(selectedCat) && !vencInput.value) {
+    vencInput.classList.add('error');
+    errVenc.classList.add('visible');
+    ok = false;
+  } else {
+    vencInput.classList.remove('error');
+    errVenc.classList.remove('visible');
+  }
+  return ok;
+}
+
+function selectUbicacion(el, tipo) {
+  document.querySelectorAll('.ubic-opt').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedUbicacion = tipo;
+  document.getElementById('err-ubic').style.display = 'none';
+  const df = document.getElementById('domicilioFields');
+  df.style.display = tipo === 'retiro' ? 'block' : 'none';
+}
+
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  photos = [...photos, ...files].slice(0, 4);
+  renderPhotos();
+  const dz = document.getElementById('dropzone');
+  if (photos.length > 0) dz.classList.add('has-file');
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photoPreview');
+  grid.innerHTML = '';
+  photos.forEach((f, i) => {
+    const url = URL.createObjectURL(f);
+    const div = document.createElement('div');
+    div.className = 'photo-thumb';
+    div.innerHTML = `<img src="${url}" alt="foto"><button class="remove-btn" onclick="removePhoto(${i})">✕</button>`;
+    grid.appendChild(div);
+  });
+}
+
+function removePhoto(i) {
+  photos.splice(i, 1);
+  renderPhotos();
+  if (photos.length === 0) document.getElementById('dropzone').classList.remove('has-file');
+}
+
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('No se pudo leer una imagen.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function validateStep(step) {
+  let ok = true;
+  if (step === 0) {
+    ['nombre','apellido','email','telefono'].forEach(id => {
+      const el = document.getElementById(id);
+      const err = document.getElementById('err-' + id);
+      if (!el.value.trim()) {
+        el.classList.add('error'); err.classList.add('visible'); ok = false;
+      } else {
+        el.classList.remove('error'); err.classList.remove('visible');
+      }
+    });
+    const email = document.getElementById('email');
+    if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+      email.classList.add('error');
+      document.getElementById('err-email').classList.add('visible');
+      ok = false;
+    }
+  }
+  if (step === 1) {
+    if (hasDraftDonationData()) {
+      ok = addDonationItem();
+    }
+    if (!donationItems.length) {
+      document.getElementById('err-items').classList.add('visible');
+      ok = false;
+    } else {
+      document.getElementById('err-items').classList.remove('visible');
+    }
+  }
+  if (step === 2) {
+    if (!selectedUbicacion) { document.getElementById('err-ubic').classList.add('visible'); ok = false; }
+    else { document.getElementById('err-ubic').classList.remove('visible'); }
+    if (selectedUbicacion === 'retiro') {
+      const dir = document.getElementById('direccion');
+      const errDir = document.getElementById('err-direccion');
+      if (!dir.value.trim()) { dir.classList.add('error'); errDir.classList.add('visible'); ok = false; }
+      else { dir.classList.remove('error'); errDir.classList.remove('visible'); }
+    }
+  }
+  return ok;
+}
+
+function goNext(from) {
+  if (!validateStep(from)) return;
+  if (from === 2) fillSummary();
+  const next = from + 1;
+  document.getElementById('panel-' + from).classList.remove('active');
+  document.getElementById('panel-' + next).classList.add('active');
+  updateStepUI(next);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack(from) {
+  const prev = from - 1;
+  document.getElementById('panel-' + from).classList.remove('active');
+  document.getElementById('panel-' + prev).classList.add('active');
+  updateStepUI(prev);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateStepUI(current) {
+  currentStep = current;
+  for (let i = 0; i < 4; i++) {
+    const ind = document.getElementById('step-ind-' + i);
+    const ss = document.getElementById('ss-' + i);
+    ind.className = 'step-item' + (i < current ? ' done' : i === current ? ' active' : '');
+    ss.className = 'ss-item' + (i < current ? ' done' : i === current ? ' active' : '');
+    if (i < 3) {
+      const conn = document.getElementById('conn-' + i);
+      conn.className = 'step-connector' + (i < current ? ' done' : '');
+    }
+  }
+}
+
+function fillSummary() {
+  const g = id => document.getElementById(id).value;
+  document.getElementById('sum-nombre').textContent = g('nombre') + ' ' + g('apellido');
+  document.getElementById('sum-email').textContent = g('email');
+  document.getElementById('sum-telefono').textContent = g('telefono');
+  const donationsList = document.getElementById('sum-donations-list');
+  donationsList.innerHTML = '';
+  donationItems.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'summary-row';
+    row.innerHTML = `<span class="summary-key">${idx + 1}. ${item.categoria}</span><span class="summary-val">${item.objeto} · ${item.estado}${item.cantidad ? ` · ${item.cantidad}` : ''}${item.fechaVencimiento ? ` · Vence: ${item.fechaVencimiento}` : ''}</span>`;
+    donationsList.appendChild(row);
+  });
+  document.getElementById('sum-ubic').textContent = selectedUbicacion === 'retiro' ? 'Retiro a domicilio' : selectedUbicacion === 'llevar' ? 'Lo llevo al Municipio' : '—';
+  if (selectedUbicacion === 'retiro' && g('direccion')) {
+    document.getElementById('sum-dir-row').style.display = 'flex';
+    document.getElementById('sum-dir').textContent = g('direccion');
+  }
+}
+
+async function submitForm() {
+  if (!document.getElementById('terms').checked) {
+    document.getElementById('err-terms').classList.add('visible');
+    return;
+  }
+  document.getElementById('err-terms').classList.remove('visible');
+
+  let serializedPhotos = [];
+  try {
+    serializedPhotos = await Promise.all(photos.map(fileToDataURL));
+  } catch (error) {
+    alert('No se pudieron procesar las fotos. Probá subirlas nuevamente.');
+    return;
+  }
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes('TU-PROYECTO')) {
+    alert('Configurá supabase-config.js con tu URL y anon key de Supabase.');
+    return;
+  }
+
+  const code = 'MC-2026-' + Math.floor(10000 + Math.random() * 90000);
+  const donation = {
+    code,
+    created_at: new Date().toISOString(),
+    donor: {
+      nombre: document.getElementById('nombre').value.trim(),
+      apellido: document.getElementById('apellido').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      telefono: document.getElementById('telefono').value.trim(),
+      tipo: document.getElementById('tipo-donante').value || 'No informado'
+    },
+    donation: {
+      items: donationItems.map(item => ({
+        categoria: item.categoria || 'No informada',
+        objeto: item.objeto || 'No informado',
+        descripcion: item.descripcion || '',
+        cantidad: item.cantidad || 'No informada',
+        estado: item.estado || 'No informado',
+        fecha_vencimiento: item.fechaVencimiento || null
+      }))
+    },
+    coordination: {
+      modalidad: selectedUbicacion || 'No informada',
+      direccion: document.getElementById('direccion').value.trim(),
+      horario: document.getElementById('horario').value.trim(),
+      referencias: document.getElementById('referencias').value.trim(),
+      preferencia: document.getElementById('preferencia').value.trim()
+    },
+    photos: serializedPhotos,
+    response: null
+  };
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/donations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(donation)
+    });
+    if (!response.ok) {
+      throw new Error('No se pudo guardar en la base de datos.');
+    }
+  } catch (error) {
+    alert('No se pudo enviar la donación. Verificá que el servidor esté ejecutándose.');
+    return;
+  }
+
+  document.getElementById('stepsRow').style.display = 'none';
+  document.querySelector('.page-layout').style.display = 'none';
+  document.getElementById('trackingCode').textContent = code;
+  document.getElementById('successScreen').classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
