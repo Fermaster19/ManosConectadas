@@ -8,6 +8,6 @@ window.SUPABASE_ANON_KEY = "sb_publishable_99kBXqBpMGdZpvnUE8rT7g_EQ62MPc8";
 //   1. Creá un "Service" conectado a tu cuenta de Gmail u otro proveedor.
 //   2. Creá un "Template" y usá las variables indicadas en donation-email.js.
 //   3. Copiá los IDs en los valores de abajo (reemplazando los "TU-...").
-window.EMAILJS_SERVICE_ID  = "TU-SERVICE-ID";   // Ej: "service_abc123"
-window.EMAILJS_TEMPLATE_ID = "TU-TEMPLATE-ID";  // Ej: "template_xyz789"
-window.EMAILJS_PUBLIC_KEY  = "TU-PUBLIC-KEY";   // Ej: "aBcDeFgHiJkLmNoPqR"
+window.EMAILJS_SERVICE_ID  = "service_nsev569";   // Ej: "service_abc123"
+window.EMAILJS_TEMPLATE_ID = "template_zyalyo7";  // Ej: "template_xyz789"
+window.EMAILJS_PUBLIC_KEY  = "wXuCSajfUc4jYxxMm";   // Ej: "aBcDeFgHiJkLmNoPqR"
