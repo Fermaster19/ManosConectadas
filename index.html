@@ -974,6 +974,32 @@ textarea { resize: vertical; min-height: 100px; }
 }
 .btn-nueva:hover { background: var(--forest-mid); transform: translateY(-1px); }
 
+.email-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.email-status.sending {
+  background: rgba(29,75,53,0.06);
+  border: 1px solid rgba(29,75,53,0.18);
+  color: var(--forest);
+}
+.email-status.sent {
+  background: rgba(46,125,82,0.08);
+  border: 1px solid rgba(46,125,82,0.28);
+  color: var(--success);
+}
+.email-status.error {
+  background: rgba(184,92,56,0.07);
+  border: 1px solid rgba(184,92,56,0.25);
+  color: var(--terracotta);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   nav { padding: 0 12px; gap: 10px; }
@@ -1451,6 +1477,11 @@ textarea { resize: vertical; min-height: 100px; }
       🔖 Código de seguimiento: <strong id="trackingCode">RS-2026-00000</strong>
     </div>
 
+    <div id="emailStatus" class="email-status sending" style="display:none;">
+      <span id="emailStatusIcon">⏳</span>
+      <span id="emailStatusText">Enviando confirmación por email…</span>
+    </div>
+
     <div class="success-next-steps">
       <div class="sns-item">
         <div class="sns-num">1</div>
@@ -1475,8 +1506,10 @@ textarea { resize: vertical; min-height: 100px; }
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="./supabase-config.js"></script>
 <script src="./text-corrector.js"></script>
+<script src="./donation-email.js"></script>
 <script>
 let currentStep = 0;
 let selectedCat = '';
@@ -1861,6 +1894,32 @@ async function submitForm() {
   document.getElementById('trackingCode').textContent = code;
   document.getElementById('successScreen').classList.add('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const emailStatusEl = document.getElementById('emailStatus');
+  const emailStatusIcon = document.getElementById('emailStatusIcon');
+  const emailStatusText = document.getElementById('emailStatusText');
+  if (window.DonationEmail && DonationEmail.isConfigured()) {
+    emailStatusEl.style.display = 'flex';
+    emailStatusEl.className = 'email-status sending';
+    emailStatusIcon.textContent = '⏳';
+    emailStatusText.textContent = 'Enviando confirmación por email…';
+    DonationEmail.sendDonationConfirmation({
+      donor: donation.donor,
+      donation: donation.donation,
+      coordination: donation.coordination,
+      code
+    }).then(function (result) {
+      if (result.ok) {
+        emailStatusEl.className = 'email-status sent';
+        emailStatusIcon.textContent = '✉️';
+        emailStatusText.textContent = 'Confirmación enviada a ' + donation.donor.email;
+      } else {
+        emailStatusEl.className = 'email-status error';
+        emailStatusIcon.textContent = '⚠️';
+        emailStatusText.textContent = 'No se pudo enviar el email de confirmación.';
+      }
+    });
+  }
 }
 
 if (window.TextCorrector) {
