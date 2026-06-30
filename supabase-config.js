@@ -1,6 +1,6 @@
 // Reemplaza estos valores con los de tu proyecto Supabase.
-window.SUPABASE_URL = "https://tixfuheptsrmrbsbtzau.supabase.co";
-window.SUPABASE_ANON_KEY = "sb_publishable_99kBXqBpMGdZpvnUE8rT7g_EQ62MPc8";
+window.SUPABASE_URL = "https://aqmjspmlgemwyrgmgesh.supabase.co";
+window.SUPABASE_ANON_KEY = "sb_publishable_sfzhV1kpawqPLIljwsG-eg_olXePQWX";
 
 // EmailJS — para enviar confirmación al donante cuando completa la donación.
 // Registrate gratis en https://www.emailjs.com (200 emails/mes gratuitos).

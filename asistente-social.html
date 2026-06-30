@@ -422,6 +422,274 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    /* Estilos para el panel de IA */
+    #aiPanel {
+      display: none;
+    }
+
+    .ai-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .ai-chat-section,
+    .ai-suggestions-section {
+      border: 1px solid var(--sand-dark);
+      border-radius: 12px;
+      padding: 16px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-chat-section h3,
+    .ai-suggestions-section h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: var(--forest);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-chat-section h3::before {
+      content: "💬";
+      font-size: 18px;
+    }
+
+    .ai-suggestions-section h3::before {
+      content: "✨";
+      font-size: 18px;
+    }
+
+    .ai-chat-messages {
+      flex: 1;
+      background: rgba(26,25,21,0.02);
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      max-height: 350px;
+      overflow-y: auto;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ai-message {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .ai-message.user {
+      background: rgba(29,75,53,0.12);
+      color: var(--forest);
+      margin-left: auto;
+      max-width: 90%;
+    }
+
+    .ai-message.assistant {
+      background: rgba(184,92,56,0.08);
+      color: var(--ink);
+      margin-right: auto;
+      max-width: 90%;
+    }
+
+    .ai-message-time {
+      font-size: 11px;
+      color: var(--ink-60);
+      font-weight: 300;
+    }
+
+    .ai-input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .ai-input-group input {
+      flex: 1;
+      margin: 0;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .ai-input-group button {
+      padding: 10px 14px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .suggestions-container {
+      flex: 1;
+      background: rgba(184,92,56,0.05);
+      border: 1px solid rgba(184,92,56,0.2);
+      border-radius: 8px;
+      padding: 12px;
+      max-height: 350px;
+      overflow-y: auto;
+      min-height: 200px;
+    }
+
+    /* Estilos para Lista de Preguntas */
+    .ai-questions-tab {
+      position: relative;
+      display: inline-block;
+    }
+
+    .ai-questions-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      border: 1.5px solid var(--sand-dark);
+      background: var(--white);
+      color: var(--ink-60);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ai-questions-btn:hover {
+      border-color: var(--forest);
+      color: var(--forest);
+      background: rgba(29,75,53,0.05);
+    }
+
+    .ai-questions-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(26,25,21,0.12);
+      max-width: 350px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease 0.15s, transform 0.25s ease 0.15s, visibility 0.25s ease 0.15s;
+      margin-top: 4px;
+      min-width: 280px;
+    }
+
+    .ai-questions-tab:hover .ai-questions-dropdown,
+    .ai-questions-dropdown:hover {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+      transition-delay: 0s;
+    }
+
+    .ai-questions-list {
+      list-style: none;
+      padding: 8px 0;
+      margin: 0;
+    }
+
+    .ai-questions-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--sand);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--ink-60);
+      transition: background 0.2s;
+    }
+
+    .ai-questions-item:last-child {
+      border-bottom: none;
+    }
+
+    .ai-questions-item:hover {
+      background: none;
+      color: var(--ink-60);
+    }
+
+    .ai-questions-item.active {
+      background: none;
+      color: var(--ink-60);
+      font-weight: normal;
+    }
+
+    .ai-questions-empty {
+      padding: 20px 12px;
+      text-align: center;
+      color: var(--ink-60);
+      font-size: 12px;
+    }
+
+    .suggestion-item {
+      background: var(--white);
+      border-left: 4px solid var(--sand-dark);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .suggestion-item.urgent-critical {
+      border-left-color: #C41E3A;
+      background: rgba(196,30,58,0.06);
+    }
+
+    .suggestion-item.urgent-high {
+      border-left-color: #FF6B6B;
+      background: rgba(255,107,107,0.06);
+    }
+
+    .suggestion-item.urgent-medium {
+      border-left-color: #FFA500;
+      background: rgba(255,165,0,0.06);
+    }
+
+    .suggestion-item.urgent-low {
+      border-left-color: #4A9970;
+      background: rgba(74,153,112,0.06);
+    }
+
+    .suggestion-category {
+      font-weight: 700;
+      color: var(--forest);
+      margin-bottom: 4px;
+    }
+
+    .suggestion-reason {
+      color: var(--ink-60);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .suggestion-urgency {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--terracotta);
+    }
+
+    .ai-empty {
+      text-align: center;
+      color: var(--ink-60);
+      padding: 20px 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 1000px) {
+      .ai-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 700px) {
       .grid-2 { grid-template-columns: 1fr; }
 
@@ -523,7 +791,10 @@
       <div id="donationsView">
         <div class="toolbar">
           <h2>Donaciones recibidas</h2>
-          <button id="btnRefresh" class="btn btn-secondary">Actualizar listado</button>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="btnRefresh" class="btn btn-secondary">Actualizar listado</button>
+            <button id="btnToggleAI" class="btn btn-secondary" style="background: rgba(184,92,56,0.08); border-color: rgba(184,92,56,0.4); color: var(--terracotta);">Asistente IA</button>
+          </div>
         </div>
         <div class="filters-row">
           <input id="filterDateFrom" type="date" title="Fecha desde">
@@ -542,6 +813,61 @@
         <div style="margin-bottom:8px;">
           <button id="btnClearFilters" class="btn btn-secondary" type="button">Limpiar filtros</button>
         </div>
+        
+        <!-- Panel de IA -->
+        <div id="aiPanel" class="card" style="margin-bottom: 16px;">
+          <div style="margin-bottom: 14px;">
+            <button id="btnCloseAI" class="btn btn-secondary" style="width: auto; font-size: 12px;">✕ Cerrar IA</button>
+          </div>
+          
+          <div class="ai-container">
+            <!-- Sección de Chat -->
+            <div class="ai-chat-section">
+              <h3>Agente IA</h3>
+              <div class="ai-chat-messages" id="aiChatMessages">
+                <div class="ai-empty">Haz preguntas sobre las donaciones...</div>
+              </div>
+              <div style="margin-bottom: 12px;">
+                <div class="ai-questions-tab">
+                  <button class="ai-questions-btn">📋 Lista de Preguntas</button>
+                  <div class="ai-questions-dropdown">
+                    <ul class="ai-questions-list" id="aiQuestionsList">
+                      <li class="ai-questions-empty">Cargando preguntas...</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-input-group">
+                <input 
+                  type="text" 
+                  id="aiChatInput" 
+                  placeholder="Ej: ¿Cuántas donaciones de alimentos hay?"
+                  title="Escribe una pregunta en lenguaje natural"
+                />
+                <button id="btnSendAIQuestion" class="btn btn-primary" style="font-size: 12px;">Enviar</button>
+                <button id="btnClearAIChat" class="btn btn-secondary" style="font-size: 12px; margin-left:8px;">Borrar chat</button>
+              </div>
+            </div>
+            
+            <!-- Sección de Sugerencias -->
+            <div class="ai-suggestions-section">
+              <h3>Sugerencias</h3>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                <button id="btnPrioritize" class="btn btn-secondary" style="flex: 1; font-size: 12px;">Priorizar donaciones</button>
+              </div>
+              <div class="suggestions-container" id="aiSuggestions">
+                <div class="ai-empty">
+                  <p>Las sugerencias aparecerán aquí cuando:</p>
+                  <ul style="text-align: left; margin-top: 8px; font-size: 12px;">
+                    <li>Selecciones una donación del lado izquierdo</li>
+                    <li>La IA analizará los datos para proponer asignaciones</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Fin Panel de IA -->
         <div class="tabs">
           <button id="tabPending" class="tab-btn active" type="button">Pendientes</button>
           <button id="tabDiscarded" class="tab-btn" type="button">Descartadas</button>
@@ -554,6 +880,7 @@
 
   <script src="./supabase-config.js"></script>
   <script src="./text-corrector.js"></script>
+  <script src="./ai-assistant.js"></script>
   <script>
     const SUPABASE_URL = window.SUPABASE_URL || "";
     const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
@@ -602,11 +929,24 @@
     const toastEl = document.getElementById("toast");
     const toastTitleEl = document.getElementById("toastTitle");
     const toastMsgEl = document.getElementById("toastMsg");
+    
+    // Elementos del panel de IA
+    const aiPanel = document.getElementById("aiPanel");
+    const btnToggleAI = document.getElementById("btnToggleAI");
+    const btnCloseAI = document.getElementById("btnCloseAI");
+    const aiChatMessages = document.getElementById("aiChatMessages");
+    const aiChatInput = document.getElementById("aiChatInput");
+    const btnSendAIQuestion = document.getElementById("btnSendAIQuestion");
+    const aiSuggestions = document.getElementById("aiSuggestions");
+    
     let activeTab = "pending";
     let cachedDonations = [];
     let currentAssistant = null;
     let activeAppView = "donations";
     let toastTimer = null;
+    let aiAssistant = null;
+    let aiPanelVisible = false;
+    let selectedDonationForSuggestions = null;
 
     function showToast(message, type = "ok", title = "Ingreso correcto", durationMs = 3000) {
       if (!toastEl) return;
@@ -1060,6 +1400,15 @@
         const isDiscarded = item.status === "discarded";
         if ((activeTab === "discarded" && isDiscarded) || (activeTab === "pending" && !isDiscarded)) {
           currentDonationList.appendChild(article);
+          
+          // Agregar evento para cargar sugerencias de IA cuando se haga click
+          article.style.cursor = "pointer";
+          article.addEventListener("click", () => {
+            if (aiPanelVisible && aiAssistant) {
+              loadDonationSuggestions(donationId);
+            }
+          });
+          
           visibleCount += 1;
         }
       });
@@ -1214,6 +1563,7 @@
       btnLogout.style.display = "inline-block";
       activeAppView = "donations";
       updatePrincipalPanelVisibility();
+      initializeAI();
       renderDonations();
     }
 
@@ -1300,6 +1650,243 @@
       if (!currentAssistant?.is_primary) return;
       setAppView(activeAppView === "assistants" ? "donations" : "assistants");
     });
+
+    // ========== Funciones para el Panel de IA ==========
+    
+    function initializeAI() {
+      if (aiAssistant) return;
+      aiAssistant = new AIAssistant(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    function toggleAIPanel() {
+      aiPanelVisible = !aiPanelVisible;
+      aiPanel.style.display = aiPanelVisible ? "block" : "none";
+      if (aiPanelVisible) {
+        aiChatInput.focus();
+        aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
+        loadQuestionsList();
+      }
+    }
+
+    function addAIMessage(text, type = "assistant") {
+      const msg = document.createElement("div");
+      msg.className = `ai-message ${type}`;
+      const time = new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+      msg.innerHTML = `
+        <div>${type === "user" ? "Vos" : "IA"}: ${text}</div>
+        <div class="ai-message-time">${time}</div>
+      `;
+      aiChatMessages.appendChild(msg);
+      aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    }
+
+    function loadAIChatHistory() {
+      // Deshabilitado: no queremos mostrar preguntas guardadas en el panel.
+      aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
+    }
+
+    async function loadQuestionsList() {
+      const aiQuestionsList = document.getElementById("aiQuestionsList");
+      if (!aiQuestionsList) return;
+
+      aiQuestionsList.innerHTML = '<li class="ai-questions-empty">Cargando preguntas...</li>';
+
+      try {
+        // Validar que tenemos URL y KEY
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+          console.error("Falta SUPABASE_URL o SUPABASE_ANON_KEY");
+          aiQuestionsList.innerHTML = '<li class="ai-questions-empty">Error: Configura Supabase</li>';
+          return;
+        }
+
+        // Consulta simple para obtener todas las preguntas
+        const url = `${SUPABASE_URL}/rest/v1/gemini_questions?select=*`;
+        
+        console.log("URL de consulta:", url);
+        
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Accept": "application/json"
+          }
+        });
+
+        console.log("[loadQuestionsList] URL:", url);
+        console.log("[loadQuestionsList] Response status:", response.status, response.statusText);
+        console.log("[loadQuestionsList] Content-Type:", response.headers.get('content-type'));
+
+        let questions = null;
+        try {
+          questions = await response.json();
+        } catch (errJson) {
+          const text = await response.text();
+          console.error("[loadQuestionsList] JSON parse error:", errJson, "raw:", text);
+          aiQuestionsList.innerHTML = `<li class=\"ai-questions-empty\">Error parseando respuesta: ${response.status}</li>`;
+          return;
+        }
+
+        console.log("[loadQuestionsList] Preguntas obtenidas (raw):", questions);
+
+        if (!questions || !Array.isArray(questions) || questions.length === 0) {
+          console.warn("[loadQuestionsList] No hay preguntas en la BD (array vacío)");
+          // Intentar consulta alternativa de verificación
+          try {
+            const testUrl = `${SUPABASE_URL}/rest/v1/gemini_questions?select=id,question,category&limit=1`;
+            const testResp = await fetch(testUrl, { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } });
+            console.log("[loadQuestionsList] Test fetch status:", testResp.status);
+            const testJson = await testResp.json().catch(() => null);
+            console.log("[loadQuestionsList] Test fetch json:", testJson);
+          } catch (testErr) {
+            console.error("[loadQuestionsList] Error en test fetch:", testErr);
+          }
+
+          aiQuestionsList.innerHTML = '<li class="ai-questions-empty">No hay preguntas cargadas</li>';
+          return;
+        }
+
+        // Mostrar todas las preguntas obtenidas
+        aiQuestionsList.innerHTML = questions.map((q, index) => {
+          const questionText = q.question || "Sin pregunta";
+          const cat = q.category || "";
+          const escaped = TextCorrector ? TextCorrector.escapeHtml(questionText) : questionText.replace(/"/g, '&quot;');
+          return `
+            <li class="ai-questions-item" data-question="${index}" data-category="${TextCorrector ? TextCorrector.escapeHtml(cat) : cat}" title="${escaped}">
+              ${questionText.length > 45 ? questionText.substring(0, 45) + "..." : questionText}
+            </li>
+          `;
+        }).join("");
+
+        console.log("Preguntas renderizadas:", questions.length);
+
+        // Agregar event listeners a las preguntas
+        aiQuestionsList.querySelectorAll(".ai-questions-item").forEach((item, index) => {
+          item.addEventListener("click", () => {
+            const question = questions[index].question;
+            const category = questions[index].category || "";
+            aiChatInput.value = question;
+            // Guardar categoría en el dataset para enviarla con la pregunta
+            aiChatInput.dataset.category = category;
+            aiChatInput.focus();
+          });
+        });
+
+      } catch (error) {
+        console.error("Error completo:", error);
+        aiQuestionsList.innerHTML = '<li class="ai-questions-empty">Error: ' + error.message + '</li>';
+      }
+    }
+
+    function clearAIChat() {
+      aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
+      if (aiChatInput) {
+        aiChatInput.value = "";
+        delete aiChatInput.dataset.category;
+      }
+    }
+
+    async function sendAIQuestion() {
+      const question = aiChatInput.value.trim();
+      if (!question) return;
+
+      initializeAI();
+
+      // Leer categoría (si fue seleccionada desde la lista)
+      const category = aiChatInput.dataset.category || null;
+
+      // Limpiar el input y dataset
+      aiChatInput.value = "";
+      delete aiChatInput.dataset.category;
+
+      // Mostrar la pregunta del usuario
+      addAIMessage(question, "user");
+
+      // Obtener respuesta de la IA pasando la categoría opcional
+      const result = await aiAssistant.answerQuestion(question, category);
+      addAIMessage(result.response, "assistant");
+    }
+
+    async function loadDonationSuggestions(donationId) {
+      if (!donationId || !aiAssistant) {
+        aiSuggestions.innerHTML = '<div class="ai-empty">Selecciona una donación para ver sugerencias.</div>';
+        return;
+      }
+
+      selectedDonationForSuggestions = cachedDonations.find(d => d.id === donationId);
+      if (!selectedDonationForSuggestions) {
+        aiSuggestions.innerHTML = '<div class="ai-empty">Donación no encontrada.</div>';
+        return;
+      }
+
+      const suggestions = aiAssistant.suggestAssignment(selectedDonationForSuggestions);
+      aiSuggestions.innerHTML = aiAssistant.formatSuggestions(suggestions);
+    }
+
+    function showAIPrioritization() {
+      if (!aiAssistant || !cachedDonations.length) {
+        aiSuggestions.innerHTML = '<div class="ai-empty">No hay donaciones para priorizar.</div>';
+        return;
+      }
+
+      const pendingDonations = cachedDonations.filter(d => d.status === "pending");
+      const prioritized = aiAssistant.prioritizeDonations(pendingDonations);
+
+      let html = '<div style="font-size: 13px; margin-bottom: 12px;">Donaciones ordenadas por urgencia:</div>';
+      prioritized.slice(0, 5).forEach((d) => {
+        // Obtener el número de donación original
+        const donationNumber = getDonationNumber(d, cachedDonations.indexOf(d));
+        
+        // Intentar obtener descripción de la donación de varias fuentes
+        let donationDescription = "";
+        
+        // Si tiene items, usar el primero
+        if (Array.isArray(d.donation?.items) && d.donation.items.length > 0) {
+          donationDescription = d.donation.items[0].objeto || "";
+          if (!donationDescription) donationDescription = d.donation.items[0].descripcion || "";
+          if (!donationDescription) donationDescription = d.donation.items[0].categoria || "";
+        } else {
+          // Si no, usar los campos directos
+          donationDescription = d.donation?.objeto || "";
+          if (!donationDescription) donationDescription = d.donation?.descripcion || "";
+          if (!donationDescription) donationDescription = d.donation?.categoria || "";
+        }
+        
+        if (!donationDescription) {
+          donationDescription = "Donación sin especificar";
+        }
+        
+        html += `
+          <div class="suggestion-item urgent-${d.urgencyLevel.toLowerCase()}">
+            <div class="suggestion-category">#${String(donationNumber).padStart(3, "0")} - ${d.code}</div>
+            <div class="suggestion-reason">${donationDescription}</div>
+            <div class="suggestion-urgency">Urgencia: ${d.urgencyLevel} (${d.urgencyScore}/100)</div>
+          </div>
+        `;
+      });
+
+      aiSuggestions.innerHTML = html;
+    }
+
+    // Event listeners para el panel de IA
+    btnToggleAI.addEventListener("click", toggleAIPanel);
+    btnCloseAI.addEventListener("click", toggleAIPanel);
+    
+    btnSendAIQuestion.addEventListener("click", sendAIQuestion);
+    aiChatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendAIQuestion();
+    });
+
+    const btnClearAIChat = document.getElementById("btnClearAIChat");
+    if (btnClearAIChat) btnClearAIChat.addEventListener("click", clearAIChat);
+
+    const btnPrioritize = document.getElementById("btnPrioritize");
+    if (btnPrioritize) {
+      btnPrioritize.addEventListener("click", () => {
+        if (!aiAssistant) initializeAI();
+        showAIPrioritization();
+      });
+    }
 
     if (window.TextCorrector) {
       TextCorrector.initFormCorrector([
