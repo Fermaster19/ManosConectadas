@@ -947,6 +947,13 @@
     let aiAssistant = null;
     let aiPanelVisible = false;
     let selectedDonationForSuggestions = null;
+    const TRACKING_STATUS_OPTIONS = [
+      "Pendiente de coordinación",
+      "Para retirar",
+      "En bodega de la municipalidad",
+      "En tránsito",
+      "Entregada"
+    ];
 
     function showToast(message, type = "ok", title = "Ingreso correcto", durationMs = 3000) {
       if (!toastEl) return;
@@ -980,7 +987,8 @@
         coordination: row.coordination || {},
         photos: row.photos || [],
         response: row.response || null,
-        status: row.status || "pending"
+        status: row.status || "pending",
+        tracking_status: row.tracking_status || "Pendiente de coordinación"
       }));
     }
 
@@ -988,6 +996,7 @@
       const updatePayload = {};
       if (Object.prototype.hasOwnProperty.call(payload, "status")) updatePayload.status = payload.status;
       if (Object.prototype.hasOwnProperty.call(payload, "response")) updatePayload.response = payload.response;
+      if (Object.prototype.hasOwnProperty.call(payload, "tracking_status")) updatePayload.tracking_status = payload.tracking_status;
 
       const response = await fetch(`${SUPABASE_URL}/rest/v1/donations?id=eq.${id}`, {
         method: "PATCH",
@@ -1341,6 +1350,7 @@
         const donationNumber = getDonationNumber(item, donations.indexOf(item));
         const extraItems = donationItems.length > 1 ? ` <span class="pill">+${donationItems.length - 1} más</span>` : "";
         const photoList = Array.isArray(item.photos) ? item.photos.filter(Boolean).slice(0, 3) : [];
+        const trackingStatus = item.tracking_status || "Pendiente de coordinación";
         const photosHtml = photoList.length
           ? `<div class="photo-list">${photoList.map((src, i) => `<img src="${src}" alt="Foto donación ${i + 1}">`).join("")}</div>`
           : "";
@@ -1373,6 +1383,9 @@
           <div style="font-size:13px; margin-bottom:8px;">
             <strong>Total de ítems:</strong> ${donationItems.length}
           </div>
+          <div style="font-size:13px; margin-bottom:10px;">
+            <strong>Estado de seguimiento:</strong> ${fmt(trackingStatus, "name")}
+          </div>
           ${photosHtml}
           <div style="margin-bottom:8px;">${itemsHtml}</div>
           <div style="font-size:13px; line-height:1.45;">
@@ -1384,6 +1397,15 @@
             ${coordinationHtml}
           </div>
           <div class="resp-box">
+            <div style="margin-bottom:10px;">
+              <label for="tracking-status-${donationId}" style="margin-top:0;">Estado de seguimiento</label>
+              <div class="inline-actions" style="gap:8px; flex-wrap:wrap; margin-top:6px;">
+                <select id="tracking-status-${donationId}" style="flex:1; min-width:220px;">
+                  ${TRACKING_STATUS_OPTIONS.map((value) => `<option value="${TextCorrector ? TextCorrector.escapeHtml(value) : value}" ${value === trackingStatus ? "selected" : ""}>${fmt(value, "name")}</option>`).join("")}
+                </select>
+                <button class="btn btn-secondary" data-update-tracking-status="${donationId}">Guardar estado</button>
+              </div>
+            </div>
             <label for="respuesta-${donationId}" style="margin-top:0;">Respuesta para el donador</label>
             <textarea id="respuesta-${donationId}" placeholder="Escribí un mensaje de seguimiento o coordinación...">${responseText ? (TextCorrector ? TextCorrector.escapeHtml(TextCorrector.correct(responseText, "sentence")) : responseText) : ""}</textarea>
             <div class="inline-actions">
@@ -1443,6 +1465,15 @@
       document.querySelectorAll("[data-delete-response]").forEach((btn) => {
         btn.addEventListener("click", () => deleteResponse(Number(btn.getAttribute("data-delete-response"))));
       });
+      document.querySelectorAll("[data-update-tracking-status]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const donationId = Number(btn.getAttribute("data-update-tracking-status"));
+          const select = document.getElementById(`tracking-status-${donationId}`);
+          if (select) {
+            updateDonationTrackingStatus(donationId, select.value);
+          }
+        });
+      });
       document.querySelectorAll("[data-discard]").forEach((btn) => {
         btn.addEventListener("click", () => changeDonationStatus(Number(btn.getAttribute("data-discard")), "discarded"));
       });
@@ -1459,11 +1490,29 @@
       try {
         await patchDonation(donationId, {
           status,
-          response: donation.response || null
+          response: donation.response || null,
+          tracking_status: donation.tracking_status || "Pendiente de coordinación"
         });
         renderDonations();
       } catch (error) {
         alert("No se pudo actualizar el estado.");
+      }
+    }
+
+    async function updateDonationTrackingStatus(donationId, trackingStatus) {
+      const donation = cachedDonations.find((item) => item.id === donationId);
+      if (!donation) return;
+      try {
+        const updated = await patchDonation(donationId, {
+          status: donation.status || "pending",
+          response: donation.response || null,
+          tracking_status: trackingStatus
+        });
+        cachedDonations = cachedDonations.map((item) => item.id === donationId ? { ...item, tracking_status: updated?.tracking_status || trackingStatus } : item);
+        showToast("Estado de seguimiento actualizado.", "ok", "Actualizado", 2500);
+        renderDonations();
+      } catch (error) {
+        alert("No se pudo actualizar el estado de seguimiento.");
       }
     }
 
@@ -1473,7 +1522,8 @@
       try {
         await patchDonation(donationId, {
           status: donation.status || "pending",
-          response: null
+          response: null,
+          tracking_status: donation.tracking_status || "Pendiente de coordinación"
         });
         renderDonations();
       } catch (error) {

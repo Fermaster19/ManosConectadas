@@ -14,8 +14,12 @@ create table if not exists public.donations (
   coordination jsonb not null default '{}'::jsonb,
   photos jsonb not null default '[]'::jsonb,
   response jsonb,
-  status text not null default 'pending'
+  status text not null default 'pending',
+  tracking_status text not null default 'Pendiente de coordinación'
 );
+
+alter table public.donations
+add column if not exists tracking_status text not null default 'Pendiente de coordinación';
 
 alter table public.donations enable row level security;
 
@@ -31,6 +35,14 @@ create policy "anon_can_insert_donations"
 on public.donations
 for insert
 to anon
+with check (true);
+
+drop policy if exists "anon_can_update_donations" on public.donations;
+create policy "anon_can_update_donations"
+on public.donations
+for update
+to anon
+using (true)
 with check (true);
 
 create table if not exists public.assistants (

@@ -8,6 +8,7 @@
 //   {{to_name}}        Nombre completo del donante
 //   {{to_email}}       Email del donante (campo "To email" del template)
 //   {{tracking_code}}  Código de seguimiento (ej: MC-2026-12345)
+//   {{tracking_status}} Estado actual del seguimiento
 //   {{items_count}}    Cantidad de ítems donados
 //   {{items_list}}     Lista de ítems con detalle
 //   {{modalidad}}      Modalidad de entrega
@@ -61,6 +62,7 @@
       to_name: ((donor.nombre || "") + " " + (donor.apellido || "")).trim() || "Donante",
       to_email: donor.email || "",
       tracking_code: code,
+      tracking_status: params.tracking_status || "Pendiente de coordinación",
       items_count: String(items.length),
       items_list: buildItemsList(items),
       modalidad: modalidad,

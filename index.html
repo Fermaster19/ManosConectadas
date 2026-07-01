@@ -94,6 +94,39 @@ nav {
   white-space: nowrap;
 }
 
+.nav-track-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--forest);
+  border: 1px solid var(--sand-dark);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-track-panel {
+  position: fixed;
+  top: 64px;
+  right: 24px;
+  width: min(440px, calc(100vw - 24px));
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: 0 0 12px 12px;
+  padding: 20px;
+  box-shadow: 0 16px 40px rgba(26,25,21,0.12);
+  z-index: 99;
+  display: none;
+}
+
+.nav-track-panel.visible { display: block; }
+
 /* HERO STRIP */
 .hero-strip {
   background: var(--forest);
@@ -261,6 +294,70 @@ nav {
   max-width: 1100px;
   margin: 0 auto;
   padding: 80px 40px 120px;
+}
+
+.tracking-card {
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 28px rgba(26,25,21,0.06);
+}
+
+.tracking-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--forest);
+  margin-bottom: 8px;
+}
+
+.tracking-desc {
+  font-size: 14px;
+  color: var(--ink-60);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.tracking-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.tracking-actions input {
+  flex: 1;
+  min-width: 240px;
+  border: 1.5px solid var(--sand-dark);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: 'Sora', sans-serif;
+}
+
+.tracking-result {
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--sand-dark);
+  font-size: 14px;
+  color: var(--ink-60);
+  line-height: 1.6;
+}
+
+.tracking-result-loading {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.tracking-result-success {
+  color: var(--forest);
+}
+
+.tracking-result-error {
+  color: var(--terracotta);
+  font-weight: 600;
 }
 
 /* STEP INDICATOR */
@@ -875,6 +972,37 @@ textarea { resize: vertical; min-height: 100px; }
   animation: fadeIn 0.6s ease-out;
 }
 
+.success-status-card {
+  background: var(--white);
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.success-status-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--forest);
+  margin-bottom: 6px;
+}
+
+.success-status-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.success-status-sub {
+  font-size: 13px;
+  color: var(--ink-60);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
 .success-screen.visible { display: block; }
 
 .success-anim {
@@ -1036,9 +1164,22 @@ textarea { resize: vertical; min-height: 100px; }
       <li><a href="#">¿Cómo funciona?</a></li>
       <li><a href="#">Necesidades actuales</a></li>
     </ul>
+    <button class="nav-track-btn" id="btnOpenTrackingPanel" type="button">Consultar seguimiento</button>
     <a href="asistente-social.html" class="nav-cta">Iniciar sesión</a>
   </div>
 </nav>
+
+<div class="nav-track-panel" id="trackingPanel">
+  <div class="tracking-title">Consultar tu código de seguimiento</div>
+  <p class="tracking-desc">Ingresá el código que te enviamos por email para ver en qué estado está tu donación.</p>
+  <div class="tracking-actions">
+    <input type="text" id="trackingLookupInput" placeholder="Ej: MC-2026-12345">
+    <button class="btn-next" id="btnTrackingLookup" type="button">Consultar</button>
+  </div>
+  <div class="tracking-result" id="trackingLookupResult">
+    Escribí tu código y presioná consultar para ver el estado actual de tu donación.
+  </div>
+</div>
 
 <!-- HERO -->
 <div class="hero-strip">
@@ -1477,6 +1618,12 @@ textarea { resize: vertical; min-height: 100px; }
       🔖 Código de seguimiento: <strong id="trackingCode">RS-2026-00000</strong>
     </div>
 
+    <div class="success-status-card">
+      <div class="success-status-label">Estado de seguimiento</div>
+      <div class="success-status-value" id="trackingStatusValue">Pendiente de coordinación</div>
+      <div class="success-status-sub">Este estado se actualizará desde el panel del asistente y se verá en tu código de seguimiento.</div>
+    </div>
+
     <div id="emailStatus" class="email-status sending" style="display:none;">
       <span id="emailStatusIcon">⏳</span>
       <span id="emailStatusText">Enviando confirmación por email…</span>
@@ -1520,6 +1667,7 @@ let donationItems = [];
 const CATEGORIAS_CON_VENCIMIENTO = ['Alimentos', 'Medicamentos'];
 const SUPABASE_URL = window.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+const DEFAULT_TRACKING_STATUS = 'Pendiente de coordinación';
 
 const CORRECTABLE_FIELDS = [
   { id: 'nombre', mode: 'name' },
@@ -1795,6 +1943,81 @@ function updateStepUI(current) {
   }
 }
 
+async function lookupDonationByCode() {
+  const input = document.getElementById('trackingLookupInput');
+  const result = document.getElementById('trackingLookupResult');
+  const code = (input.value || '').trim().toUpperCase();
+
+  if (!code) {
+    result.className = 'tracking-result tracking-result-error';
+    result.innerHTML = 'Ingresá un código de seguimiento para consultar el estado.';
+    return;
+  }
+
+  result.className = 'tracking-result tracking-result-loading';
+  result.innerHTML = 'Buscando tu donación...';
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes('TU-PROYECTO')) {
+    result.className = 'tracking-result tracking-result-error';
+    result.innerHTML = 'La consulta no está disponible porque aún no configuraste Supabase.';
+    return;
+  }
+
+  try {
+    const query = new URLSearchParams({
+      select: 'code,created_at,tracking_status,status,donation,coordination,donor',
+      code: `eq.${code}`,
+      limit: '1'
+    }).toString();
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/donations?${query}`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('No se pudo consultar la donación.');
+    }
+
+    const rows = await response.json();
+    if (!rows || !rows.length) {
+      result.className = 'tracking-result tracking-result-error';
+      result.innerHTML = 'No encontramos una donación con ese código. Revisá si está bien escrito o contactá al equipo municipal.';
+      return;
+    }
+
+    const row = rows[0];
+    const createdAt = row.created_at ? new Date(row.created_at).toLocaleString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : 'Sin fecha';
+    const itemsCount = Array.isArray(row.donation?.items) ? row.donation.items.length : 1;
+    const modalidad = row.coordination?.modalidad === 'retiro'
+      ? 'Retiro a domicilio'
+      : row.coordination?.modalidad === 'llevar'
+        ? 'Lo lleva al Municipio'
+        : 'No informada';
+    const statusText = row.tracking_status || 'Pendiente de coordinación';
+
+    result.className = 'tracking-result tracking-result-success';
+    result.innerHTML = `
+      <strong>Código:</strong> ${row.code || code}<br>
+      <strong>Estado:</strong> ${statusText}<br>
+      <strong>Fecha de carga:</strong> ${createdAt}<br>
+      <strong>Ítems:</strong> ${itemsCount}<br>
+      <strong>Modalidad:</strong> ${modalidad}
+    `;
+  } catch (error) {
+    result.className = 'tracking-result tracking-result-error';
+    result.innerHTML = error.message || 'No se pudo consultar la donación en este momento.';
+  }
+}
+
 function fillSummary() {
   const g = id => document.getElementById(id).value;
   document.getElementById('sum-nombre').textContent = g('nombre') + ' ' + g('apellido');
@@ -1839,9 +2062,12 @@ async function submitForm() {
   }
 
   const code = 'MC-2026-' + Math.floor(10000 + Math.random() * 90000);
+  const trackingStatus = DEFAULT_TRACKING_STATUS;
   const donation = {
     code,
     created_at: new Date().toISOString(),
+    status: 'pending',
+    tracking_status: trackingStatus,
     donor: {
       nombre: document.getElementById('nombre').value.trim(),
       apellido: document.getElementById('apellido').value.trim(),
@@ -1892,6 +2118,7 @@ async function submitForm() {
   document.getElementById('stepsRow').style.display = 'none';
   document.querySelector('.page-layout').style.display = 'none';
   document.getElementById('trackingCode').textContent = code;
+  document.getElementById('trackingStatusValue').textContent = trackingStatus;
   document.getElementById('successScreen').classList.add('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -1907,7 +2134,8 @@ async function submitForm() {
       donor: donation.donor,
       donation: donation.donation,
       coordination: donation.coordination,
-      code
+      code,
+      tracking_status: trackingStatus
     }).then(function (result) {
       if (result.ok) {
         emailStatusEl.className = 'email-status sent';
@@ -1921,6 +2149,30 @@ async function submitForm() {
     });
   }
 }
+
+const trackingPanel = document.getElementById('trackingPanel');
+const btnOpenTrackingPanel = document.getElementById('btnOpenTrackingPanel');
+
+btnOpenTrackingPanel.addEventListener('click', () => {
+  trackingPanel.classList.toggle('visible');
+  if (trackingPanel.classList.contains('visible')) {
+    document.getElementById('trackingLookupInput').focus();
+  }
+});
+
+document.addEventListener('click', (event) => {
+  if (!trackingPanel.contains(event.target) && !btnOpenTrackingPanel.contains(event.target)) {
+    trackingPanel.classList.remove('visible');
+  }
+});
+
+document.getElementById('btnTrackingLookup').addEventListener('click', lookupDonationByCode);
+document.getElementById('trackingLookupInput').addEventListener('keydown', function (event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    lookupDonationByCode();
+  }
+});
 
 if (window.TextCorrector) {
   TextCorrector.initFormCorrector(CORRECTABLE_FIELDS);
