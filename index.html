@@ -1972,17 +1972,26 @@ async function lookupDonationByCode() {
 
     const response = await fetch(`${SUPABASE_URL}/rest/v1/donations?${query}`, {
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        Accept: 'application/json'
       }
     });
 
+    const contentType = response.headers.get('content-type') || '';
+    const payload = contentType.includes('application/json')
+      ? await response.json()
+      : await response.text();
+
     if (!response.ok) {
-      throw new Error('No se pudo consultar la donación.');
+      const details = typeof payload === 'object' && payload !== null
+        ? payload.message || payload.error || JSON.stringify(payload)
+        : payload;
+      throw new Error(`No se pudo consultar la donación. ${details}`);
     }
 
-    const rows = await response.json();
-    if (!rows || !rows.length) {
+    const rows = Array.isArray(payload) ? payload : [];
+    if (!rows.length) {
       result.className = 'tracking-result tracking-result-error';
       result.innerHTML = 'No encontramos una donación con ese código. Revisá si está bien escrito o contactá al equipo municipal.';
       return;
