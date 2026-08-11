@@ -90,6 +90,15 @@ create table if not exists public.gemini_questions (
   created_at timestamptz not null default now()
 );
 
+alter table public.gemini_questions enable row level security;
+
+drop policy if exists "anon_can_read_gemini_questions" on public.gemini_questions;
+create policy "anon_can_read_gemini_questions"
+  on public.gemini_questions
+  for select
+  to anon
+  using (true);
+
 insert into public.gemini_questions (question, category)
 values
   ('¿Cuántas donaciones hay pendientes?', 'cantidad'),
