@@ -1735,6 +1735,18 @@
       aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
     }
 
+    const DEFAULT_GEMINI_QUESTIONS = [
+      { question: '¿Cuántas donaciones hay pendientes?', category: 'cantidad' },
+      { question: '¿Cuántas donaciones están en estado pending?', category: 'cantidad' },
+      { question: '¿Cuántas donaciones de alimentos hay?', category: 'categoria' },
+      { question: '¿Cuántas donaciones de ropa hay?', category: 'categoria' },
+      { question: '¿Qué donaciones tienen modalidad retiro?', category: 'modalidad' },
+      { question: '¿Qué donaciones son urgentes?', category: 'urgencia' },
+      { question: '¿Qué donaciones están asignadas?', category: 'estado' },
+      { question: '¿Qué donaciones tienen respuesta?', category: 'respuesta' },
+      { question: '¿Qué preguntas conviene hacer para priorizar donaciones urgentes?', category: 'consulta' }
+    ];
+
     async function loadQuestionsList() {
       const aiQuestionsList = document.getElementById("aiQuestionsList");
       if (!aiQuestionsList) return;
@@ -1768,12 +1780,20 @@
         console.log("[loadQuestionsList] Content-Type:", response.headers.get('content-type'));
 
         let questions = null;
+        let responseBody = null;
         try {
-          questions = await response.json();
+          responseBody = await response.text();
+          questions = responseBody ? JSON.parse(responseBody) : null;
         } catch (errJson) {
-          const text = await response.text();
-          console.error("[loadQuestionsList] JSON parse error:", errJson, "raw:", text);
-          aiQuestionsList.innerHTML = `<li class=\"ai-questions-empty\">Error parseando respuesta: ${response.status}</li>`;
+          console.error("[loadQuestionsList] JSON parse error:", errJson, "raw:", responseBody);
+          aiQuestionsList.innerHTML = `<li class="ai-questions-empty">Error parseando respuesta: ${response.status}</li>`;
+          return;
+        }
+
+        if (!response.ok) {
+          console.error("[loadQuestionsList] Error response:", response.status, questions);
+          const message = questions?.message || questions?.error || response.statusText || response.status;
+          aiQuestionsList.innerHTML = `<li class="ai-questions-empty">Error al cargar preguntas: ${message}</li>`;
           return;
         }
 
@@ -1781,19 +1801,24 @@
 
         if (!questions || !Array.isArray(questions) || questions.length === 0) {
           console.warn("[loadQuestionsList] No hay preguntas en la BD (array vacío)");
-          // Intentar consulta alternativa de verificación
-          try {
-            const testUrl = `${SUPABASE_URL}/rest/v1/gemini_questions?select=id,question,category&limit=1`;
-            const testResp = await fetch(testUrl, { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } });
-            console.log("[loadQuestionsList] Test fetch status:", testResp.status);
-            const testJson = await testResp.json().catch(() => null);
-            console.log("[loadQuestionsList] Test fetch json:", testJson);
-          } catch (testErr) {
-            console.error("[loadQuestionsList] Error en test fetch:", testErr);
-          }
+          if (Array.isArray(questions) && questions.length === 0) {
+            questions = DEFAULT_GEMINI_QUESTIONS;
+            console.log("[loadQuestionsList] Usando preguntas predeterminadas:", questions.length);
+          } else {
+            // Intentar consulta alternativa de verificación
+            try {
+              const testUrl = `${SUPABASE_URL}/rest/v1/gemini_questions?select=id,question,category&limit=1`;
+              const testResp = await fetch(testUrl, { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } });
+              console.log("[loadQuestionsList] Test fetch status:", testResp.status);
+              const testJson = await testResp.json().catch(() => null);
+              console.log("[loadQuestionsList] Test fetch json:", testJson);
+            } catch (testErr) {
+              console.error("[loadQuestionsList] Error en test fetch:", testErr);
+            }
 
-          aiQuestionsList.innerHTML = '<li class="ai-questions-empty">No hay preguntas cargadas</li>';
-          return;
+            aiQuestionsList.innerHTML = '<li class="ai-questions-empty">No hay preguntas cargadas</li>';
+            return;
+          }
         }
 
         // Mostrar todas las preguntas obtenidas
