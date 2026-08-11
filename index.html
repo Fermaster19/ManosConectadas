@@ -1965,7 +1965,7 @@ async function lookupDonationByCode() {
 
   try {
     const query = new URLSearchParams({
-      select: 'code,created_at,tracking_status,status,donation,coordination,donor',
+      select: 'code,created_at,status,donation,coordination,donor',
       code: `eq.${code}`,
       limit: '1'
     }).toString();
@@ -2011,7 +2011,7 @@ async function lookupDonationByCode() {
       : row.coordination?.modalidad === 'llevar'
         ? 'Lo lleva al Municipio'
         : 'No informada';
-    const statusText = row.tracking_status || 'Pendiente de coordinación';
+    const statusText = row.tracking_status || row.status || 'Pendiente de coordinación';
 
     result.className = 'tracking-result tracking-result-success';
     result.innerHTML = `
@@ -2076,7 +2076,6 @@ async function submitForm() {
     code,
     created_at: new Date().toISOString(),
     status: 'pending',
-    tracking_status: trackingStatus,
     donor: {
       nombre: document.getElementById('nombre').value.trim(),
       apellido: document.getElementById('apellido').value.trim(),
