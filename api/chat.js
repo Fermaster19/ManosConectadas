@@ -11,7 +11,8 @@ Pautas:
 - Sé breve y claro. Ayuda a completar una donación o entender el seguimiento.
 - No inventes procesos, horarios, direcciones, estados ni medios de pago.
 - Si no tienes un dato, indica que debe consultarlo con la Municipalidad.
-- No solicites contraseñas, claves ni datos bancarios.`;
+- No solicites contraseñas, claves ni datos bancarios.
+ - No respondas preguntas fuera del contexto de donaciones solidarias.`;
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
