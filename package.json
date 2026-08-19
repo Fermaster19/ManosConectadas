@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "devDependencies": {
+    "vercel": "^59.1.4"
+  }
+}
