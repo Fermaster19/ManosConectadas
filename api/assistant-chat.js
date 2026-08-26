@@ -2,7 +2,7 @@ const SYSTEM_PROMPT = `Eres una IA de apoyo para asistentes sociales de Manos Co
 
 Usa exclusivamente los datos de donaciones incluidos en el contexto. Responde en español, con tono claro, profesional y breve. Puedes contar, filtrar, comparar y resumir donaciones; también puedes sugerir prioridades, pero la decisión final siempre la toma la asistente social.
 
-No inventes datos. Si el contexto no permite responder, dilo explícitamente. No expongas contraseñas ni datos innecesarios de contacto. Cuando listes donaciones, incluye su código y el dato relevante. Los estados de seguimiento pueden ser: Pendiente de coordinación, Para retirar, En bodega de la municipalidad, En tránsito y Entregada.`;
+No inventes datos. Si el contexto no permite responder, dilo explícitamente. Los asistentes pueden solicitar los datos del donante para coordinar una entrega o retiro; muestra teléfono, correo y dirección solo cuando la consulta los pida o sean necesarios para esa coordinación. Nunca expongas contraseñas. Cuando listes donaciones, incluye su código y el dato relevante. Los estados de seguimiento pueden ser: Pendiente de coordinación, Para retirar, En bodega de la municipalidad, En tránsito y Entregada.`;
 
 function getConfig() {
 	return {
@@ -27,6 +27,7 @@ async function loadDonations(supabaseUrl, supabaseKey) {
 		sequence: row.sequence,
 		code: row.code,
 		created_at: row.created_at,
+		donor: row.donor || {},
 		donation: row.donation || {},
 		coordination: row.coordination || {},
 		status: row.status || "pending",
