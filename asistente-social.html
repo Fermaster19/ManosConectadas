@@ -466,7 +466,7 @@
 
     .ai-chat-messages {
       flex: 1;
-      background: rgba(26,25,21,0.02);
+      background: linear-gradient(180deg, rgba(29,75,53,0.04), rgba(184,92,56,0.03));
       border: 1px solid var(--sand);
       border-radius: 8px;
       padding: 12px;
@@ -480,33 +480,110 @@
     }
 
     .ai-message {
+      position: relative;
       display: flex;
       flex-direction: column;
       gap: 4px;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 11px 13px;
+      border-radius: 14px;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      animation: aiMessageIn 0.22s ease-out both;
+    }
+
+    @keyframes aiMessageIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ai-message::before {
+      content: "";
+      display: block;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 2px;
+      border-radius: 50%;
+      background: var(--white) center / 14px no-repeat;
+      box-shadow: 0 1px 4px rgba(26,25,21,0.12);
     }
 
     .ai-message.user {
-      background: rgba(29,75,53,0.12);
-      color: var(--forest);
+      background: var(--forest);
+      color: white;
       margin-left: auto;
-      max-width: 90%;
+      max-width: 88%;
+      border-bottom-right-radius: 4px;
+    }
+
+    .ai-message.user::before {
+      content: "T";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--forest);
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--sand);
     }
 
     .ai-message.assistant {
-      background: rgba(184,92,56,0.08);
+      background: var(--white);
+      border: 1px solid rgba(184,92,56,0.18);
       color: var(--ink);
       margin-right: auto;
-      max-width: 90%;
+      max-width: 94%;
+      border-bottom-left-radius: 4px;
+    }
+
+    .ai-message.assistant::before,
+    .ai-message.loading::before {
+      content: "✦";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--terracotta);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .ai-message.loading {
+      color: var(--ink-60);
+      font-style: italic;
+    }
+
+    .ai-message.loading::after {
+      content: "";
+      position: absolute;
+      left: 45px;
+      bottom: 14px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--terracotta);
+      box-shadow: 9px 0 var(--terracotta), 18px 0 var(--terracotta);
+      animation: aiTyping 1s infinite ease-in-out;
+    }
+
+    @keyframes aiTyping {
+      0%, 100% { opacity: 0.35; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-2px); }
     }
 
     .ai-message-time {
       font-size: 11px;
       color: var(--ink-60);
       font-weight: 300;
+    }
+
+    .ai-message.user .ai-message-time { color: rgba(255,255,255,0.65); }
+
+    .ai-message.error {
+      background: rgba(174,47,47,0.08);
+      border: 1px solid rgba(174,47,47,0.2);
+      color: #8f2f2f;
+      margin-right: auto;
+      max-width: 94%;
     }
 
     .ai-input-group {
@@ -1723,10 +1800,13 @@
       const msg = document.createElement("div");
       msg.className = `ai-message ${type}`;
       const time = new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-      msg.innerHTML = `
-        <div>${type === "user" ? "Vos" : "IA"}: ${text}</div>
-        <div class="ai-message-time">${time}</div>
-      `;
+      const label = type === "user" ? "Vos" : type === "error" ? "Aviso" : type === "loading" ? "IA" : "IA · Datos de donaciones";
+      const content = document.createElement("div");
+      content.textContent = `${label}: ${text}`;
+      const timeElement = document.createElement("div");
+      timeElement.className = "ai-message-time";
+      timeElement.textContent = time;
+      msg.append(content, timeElement);
       aiChatMessages.appendChild(msg);
       aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
     }
