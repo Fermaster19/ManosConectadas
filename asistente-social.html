@@ -946,6 +946,7 @@
     let toastTimer = null;
     let aiAssistant = null;
     let aiPanelVisible = false;
+    let aiConversation = [];
     let selectedDonationForSuggestions = null;
     const TRACKING_STATUS_OPTIONS = [
       "Pendiente de coordinación",
@@ -1855,6 +1856,7 @@
 
     function clearAIChat() {
       aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
+      aiConversation = [];
       if (aiChatInput) {
         aiChatInput.value = "";
         delete aiChatInput.dataset.category;
@@ -1865,21 +1867,38 @@
       const question = aiChatInput.value.trim();
       if (!question) return;
 
-      initializeAI();
-
-      // Leer categoría (si fue seleccionada desde la lista)
-      const category = aiChatInput.dataset.category || null;
-
-      // Limpiar el input y dataset
       aiChatInput.value = "";
       delete aiChatInput.dataset.category;
-
-      // Mostrar la pregunta del usuario
       addAIMessage(question, "user");
+      aiConversation.push({ role: "user", content: question });
+      btnSendAIQuestion.disabled = true;
+      aiChatInput.disabled = true;
+      addAIMessage("Consultando la base de datos...", "loading");
 
-      // Obtener respuesta de la IA pasando la categoría opcional
-      const result = await aiAssistant.answerQuestion(question, category);
-      addAIMessage(result.response, "assistant");
+      try {
+        const response = await fetch("/api/assistant-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: aiConversation,
+            supabaseUrl: SUPABASE_URL,
+            supabaseKey: SUPABASE_ANON_KEY
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "No pudimos responder.");
+
+        aiChatMessages.querySelector(".ai-message.loading")?.remove();
+        aiConversation.push({ role: "assistant", content: data.content });
+        addAIMessage(data.content, "assistant");
+      } catch (error) {
+        aiChatMessages.querySelector(".ai-message.loading")?.remove();
+        addAIMessage(error.message || "No pudimos conectar con el asistente.", "error");
+      } finally {
+        btnSendAIQuestion.disabled = false;
+        aiChatInput.disabled = false;
+        aiChatInput.focus();
+      }
     }
 
     async function loadDonationSuggestions(donationId) {
