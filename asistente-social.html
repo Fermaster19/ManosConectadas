@@ -6,6 +6,7 @@
   <title>Asistente social | Manos Conectadas</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -220,12 +221,90 @@
 
     .toolbar h2 { margin: 0; }
 
+    .dashboard-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(26, 25, 21, 0.05);
+    }
+
+    .summary-card span {
+      display: block;
+      color: var(--ink-60);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .summary-card strong {
+      display: block;
+      color: var(--forest);
+      font-family: "Lora", serif;
+      font-size: 30px;
+    }
+
+    .summary-card small {
+      color: var(--ink-60);
+      font-size: 11px;
+    }
+
+    .dashboard-panels {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .dashboard-panel {
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .dashboard-panel h3 {
+      color: var(--forest);
+      font-size: 16px;
+      margin-bottom: 3px;
+    }
+
+    .dashboard-panel p {
+      color: var(--ink-60);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .dashboard-chart { height: 240px; position: relative; overflow: hidden; }
+    .dashboard-chart svg { display: block; width: 100%; height: 100%; overflow: hidden; }
+
+    .social-work-note {
+      color: var(--ink-60);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
     .filters-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 10px;
       margin: 10px 0 4px;
     }
+
+    .filters-details { margin: 4px 0 14px; }
+    .filters-toggle { display: inline-flex; align-items: center; gap: 8px; }
+    .filters-toggle::-webkit-details-marker { display: none; }
+    .filters-toggle::after { content: "+"; font-size: 18px; line-height: 1; }
+    .filters-details[open] .filters-toggle::after { content: "-"; }
+    .filters-details .filters-row { margin-top: 12px; }
 
     .donation-list {
       display: grid;
@@ -444,6 +523,39 @@
       display: flex;
       flex-direction: column;
     }
+
+    .ai-suggestions-floating {
+      display: none;
+      position: fixed;
+      z-index: 151;
+      top: 50%;
+      left: calc(50% + 188px);
+      width: min(320px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      transform: translateY(-50%);
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 24px 70px rgba(23,58,46,.28);
+    }
+    .ai-suggestions-floating.visible { display: block; }
+    .ai-fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 130;
+      width: 58px;
+      height: 58px;
+      padding: 0;
+      border-radius: 50%;
+      background: var(--terracotta);
+      color: #fff;
+      font-size: 24px;
+      box-shadow: 0 8px 24px rgba(184,92,56,.35);
+    }
+    .ai-fab:hover { background: var(--terracotta-dark); transform: translateY(-2px); }
 
     .ai-chat-section h3,
     .ai-suggestions-section h3 {
@@ -766,10 +878,16 @@
       .ai-container {
         grid-template-columns: 1fr;
       }
+
+      .dashboard-summary { grid-template-columns: repeat(2, 1fr); }
+      .dashboard-panels { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 700px) {
       .grid-2 { grid-template-columns: 1fr; }
+      .dashboard-summary { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .summary-card { padding: 12px; }
+      .summary-card strong { font-size: 25px; }
 
       .topbar {
         height: auto;
@@ -810,6 +928,205 @@
         font-size: 15px;
       }
     }
+
+    /* Panel de gestión: lenguaje visual de la plantilla compartida */
+    :root {
+      --cream: #F7F3EA;
+      --white: #FFFFFF;
+      --green-900: #132E25;
+      --green-800: #173A2E;
+      --green-700: #1F4A3B;
+      --green-600: #2C5F4C;
+      --green-500: #3B7660;
+      --green-100: #E3EEE6;
+      --green-50: #EFF5F0;
+      --green-ink: #173226;
+      --ink: #22201B;
+      --ink-soft: #6B6558;
+      --ink-faint: #948E7F;
+      --terracotta: #C1592E;
+      --terracotta-dark: #A24721;
+      --terracotta-soft: #F3DECB;
+      --gold: #C8932E;
+      --gold-soft: #F5E7C4;
+      --brick: #A24A3F;
+      --brick-soft: #F1DAD4;
+      --sand-dark: #E4DDC9;
+      --radius: 14px;
+    }
+
+    body { background: var(--cream); color: var(--ink); }
+    .topbar {
+      height: auto; min-height: 76px; background: rgba(247,243,234,.9);
+      border-bottom: 1px solid var(--sand-dark); padding: 18px 32px;
+      left: 276px;
+    }
+    .brand { font-family: 'Fraunces', Georgia, serif; color: var(--green-ink); font-size: 21px; }
+    .brand span { color: #E8A05F; font-style: italic; }
+    .topbar-actions .btn-secondary { background: var(--white); color: var(--green-ink); border-color: var(--sand-dark); }
+    .topbar-actions .btn-primary { background: var(--green-700); }
+    .topbar-actions { margin-left: auto; justify-content: flex-end; }
+    .wrap { max-width: none; padding: 100px 32px 40px; }
+    #panelApp { display: none; padding: 0; background: transparent; border: 0; box-shadow: none; }
+    .app-shell { --sidebar-width: 248px; display: block; min-height: calc(100vh - 100px); }
+    .app-sidebar {
+      width: var(--sidebar-width); position: fixed; z-index: 40; top: 0; left: 0; bottom: 0;
+      min-height: 100vh; border-radius: 0;
+      background: linear-gradient(180deg, var(--green-800), var(--green-900)); color: #E7EFE9;
+      padding: 22px 16px 18px; display: flex; flex-direction: column; overflow-y: auto;
+      transition: width .2s ease, transform .2s ease;
+    }
+    .app-sidebar-brand { display: flex; align-items: baseline; gap: 6px; padding: 6px 8px 22px; }
+    .app-sidebar-mark { width: 30px; height: 30px; border-radius: 9px; background: var(--terracotta); display: grid; place-items: center; font-family: 'Fraunces', Georgia, serif; font-weight: 700; margin-right: 6px; }
+    .app-sidebar-name { font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 600; color: #fff; }
+    .app-sidebar-name em { color: #E8A05F; font-weight: 500; }
+    .app-nav-label { color: #8FA79A; font-size: 11px; padding: 14px 10px 6px; letter-spacing: .04em; }
+    .app-nav-btn { border: 1px solid transparent; border-radius: 10px; background: transparent; color: #CFDDD4; cursor: pointer; font: 500 14px 'Work Sans', sans-serif; padding: 10px 12px; text-align: left; }
+    .app-nav-btn:hover, .app-nav-btn.active { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.08); color: #fff; }
+    .sidebar-toggle { margin: 0 0 10px auto; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: 18px; line-height: 1; }
+    .sidebar-toggle:hover { background: rgba(255,255,255,.16); }
+    .app-sidebar-foot { margin-top: auto; border-top: 1px solid rgba(255,255,255,.09); padding: 14px 10px 4px; color: #fff; font-size: 13px; }
+    .app-sidebar-foot small { display: block; color: #9FB6A9; margin-top: 3px; }
+    .app-main { min-width: 0; background: transparent; padding: 0 0 20px; margin-left: calc(var(--sidebar-width) + 14px); transition: margin-left .2s ease; }
+    .app-shell.sidebar-collapsed { --sidebar-width: 76px; }
+    .app-shell.sidebar-collapsed .app-sidebar { padding-left: 10px; padding-right: 10px; }
+    .app-shell.sidebar-collapsed .app-sidebar-name,
+    .app-shell.sidebar-collapsed .app-nav-label,
+    .app-shell.sidebar-collapsed .app-sidebar-foot { display: none; }
+    .app-shell.sidebar-collapsed .app-sidebar-brand { justify-content: center; padding-left: 0; padding-right: 0; }
+    .app-shell.sidebar-collapsed .app-nav-btn { font-size: 0; text-align: center; padding-left: 8px; padding-right: 8px; }
+    .app-shell.sidebar-collapsed .sidebar-toggle { margin-right: auto; }
+    #principalPanel, #donationsView { margin: 0 0 14px 14px; border-radius: 0 14px 14px 0; }
+    #summaryView { display: none; margin: 0 0 14px 14px; padding: 22px 20px 40px; }
+    #summaryView h1 { color: var(--green-ink); font: 600 26px 'Fraunces', Georgia, serif; margin-bottom: 4px; }
+    #summaryView .summary-subtitle { color: var(--ink-soft); font-size: 13px; margin-bottom: 18px; }
+    .summary-chart-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-top: 14px; }
+    .summary-chart-wide { grid-column: span 2; }
+    #donationsView { background: transparent; border: 0; box-shadow: none; padding: 20px 18px 40px; }
+    #aiPanel {
+      position: fixed;
+      z-index: 135;
+      right: 24px;
+      bottom: 94px;
+      width: min(520px, calc(100vw - 32px));
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      margin: 0;
+      background: var(--white);
+      box-shadow: 0 20px 55px rgba(23,58,46,.24);
+    }
+    #aiPanel .ai-container { display: block; }
+    #principalPanel { background: var(--white); border-color: var(--sand-dark); box-shadow: 0 8px 24px -12px rgba(23,58,46,.18); }
+    #panelApp:has(#assistantFormModal[style*="display: block"])::before {
+      content: "";
+      position: fixed;
+      z-index: 140;
+      inset: 0;
+      background: rgba(8, 24, 18, .68);
+      backdrop-filter: blur(3px);
+    }
+    body:has(#assistantFormModal[style*="display: block"]) { overflow: hidden; }
+    #assistantFormModal {
+      position: fixed;
+      z-index: 150;
+      top: 50%;
+      left: 50%;
+      width: min(680px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      margin: 0;
+      padding: 24px;
+      transform: translate(-50%, -50%);
+      background: var(--white);
+      border-radius: 14px;
+      animation: assistantModalIn .18s ease-out;
+    }
+    .assistant-module-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .assistant-module-header .btn { flex: 0 0 auto; padding: 8px 11px; }
+    .assistant-form-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .assistant-form-header .btn { flex: 0 0 auto; padding: 8px 11px; }
+    @keyframes assistantModalIn {
+      from { opacity: 0; transform: translate(-50%, -47%) scale(.98); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    .toolbar h2, .section-title, .admin-panel h3 { color: var(--green-ink); font-family: 'Fraunces', Georgia, serif; }
+    .toolbar { margin-bottom: 18px; }
+    .filters-row { background: transparent; }
+    .filters-row input, .filters-row select { background: var(--white); border-color: var(--sand-dark); color: var(--ink); }
+    .tab-btn.active { background: var(--green-700); border-color: var(--green-700); }
+    .donation-item, .card { border-color: var(--sand-dark); box-shadow: 0 1px 2px rgba(23,58,46,.06), 0 8px 24px -12px rgba(23,58,46,.18); }
+    .donation-item { border-radius: 12px; }
+    .donation-details summary { list-style: none; cursor: pointer; }
+    .donation-details summary::-webkit-details-marker { display: none; }
+    .donation-details summary::after { content: "+ Ver detalles"; float: right; color: var(--green-600); font-size: 12px; font-weight: 600; }
+    .donation-details[open] summary::after { content: "- Ocultar detalles"; }
+    body:has(.donation-details[open]) { overflow: hidden; }
+    body:has(.donation-details[open])::before {
+      content: "";
+      position: fixed;
+      z-index: 140;
+      inset: 0;
+      background: rgba(8, 24, 18, .68);
+      backdrop-filter: blur(3px);
+    }
+    .donation-details[open] {
+      position: fixed;
+      z-index: 150;
+      top: 50%;
+      left: calc(50% - 508px);
+      width: min(680px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      padding: 18px;
+      transform: translateY(-50%);
+      background: var(--white);
+      border: 1px solid var(--sand-dark);
+      border-radius: 14px;
+      box-shadow: 0 24px 70px rgba(23,58,46,.28);
+      animation: donationModalIn .18s ease-out;
+    }
+    .donation-details[open] summary { padding-bottom: 12px; border-bottom: 1px solid var(--sand-dark); }
+    .donation-details-body { padding-top: 12px; }
+    @keyframes donationModalIn {
+      from { opacity: 0; transform: translateY(-47%) scale(.98); }
+      to { opacity: 1; transform: translateY(-50%) scale(1); }
+    }
+    .ai-chat-section, .ai-suggestions-section { border-color: var(--sand-dark); }
+
+    @media (max-width: 900px) {
+      .wrap { padding-left: 14px; padding-right: 14px; }
+      .app-shell { --sidebar-width: 76px; }
+      .topbar { left: 90px; padding: 14px 16px; }
+      .app-sidebar { left: 0; top: 0; width: var(--sidebar-width); padding: 18px 10px; }
+      .app-sidebar-name, .app-nav-label, .app-sidebar-foot { display: none; }
+      .app-sidebar-brand { justify-content: center; padding-left: 0; padding-right: 0; }
+      .app-nav-btn { font-size: 0; text-align: center; padding-left: 8px; padding-right: 8px; }
+      #principalPanel, #donationsView { margin-left: 10px; }
+      #summaryView { margin-left: 10px; }
+      .ai-suggestions-floating { left: 50%; top: auto; bottom: 16px; transform: translateX(-50%); }
+      .donation-details[open] { left: 50%; transform: translate(-50%, -50%); animation: donationModalInMobile .18s ease-out; }
+    }
+
+    @media (max-width: 640px) {
+      .topbar { padding: 14px 16px; }
+      .wrap { padding-top: 92px; }
+      .app-shell { min-height: calc(100vh - 92px); }
+      .app-shell { --sidebar-width: 62px; }
+      .topbar { left: 76px; }
+      .app-sidebar { left: 0; width: var(--sidebar-width); padding-left: 7px; padding-right: 7px; }
+      #principalPanel, #donationsView { margin-left: 6px; border-radius: 10px; }
+      #summaryView { margin-left: 6px; padding: 16px 8px 30px; }
+      .summary-chart-grid { grid-template-columns: 1fr; }
+      .summary-chart-wide { grid-column: auto; }
+      #donationsView { padding: 14px 8px 30px; }
+      .ai-fab { right: 16px; bottom: 16px; }
+      #aiPanel { right: 16px; bottom: 86px; }
+    }
+
+    @keyframes donationModalInMobile {
+      from { opacity: 0; transform: translate(-50%, -47%) scale(.98); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -821,7 +1138,6 @@
     </div>
   </div>
   <div class="topbar">
-    <div class="brand">Manos<span> Conectadas</span></div>
     <div class="topbar-actions">
       <a id="btnBackToDonar" class="btn btn-secondary" href="./" style="text-align:center; display:inline-block; text-decoration:none;">Volver a Donar</a>
       <button id="btnAssistantManager" class="btn btn-secondary" style="display:none;">Gestión de asistentes</button>
@@ -844,10 +1160,53 @@
       <div id="loginMsg"></div>
     </div>
 
-    <div id="panelApp" class="card">
+    <div id="panelApp">
+      <div class="app-shell">
+        <aside class="app-sidebar" aria-label="Navegación del panel">
+          <div class="app-sidebar-brand"><div class="app-sidebar-mark">M</div><div class="app-sidebar-name">Manos <em>Conectadas</em></div></div>
+          <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Ocultar menú lateral" aria-expanded="true">‹</button>
+          <div class="app-nav-label">PANEL</div>
+          <button class="app-nav-btn active" id="navSummary" type="button">Resumen general</button>
+          <div class="app-nav-label">DONACIONES</div>
+          <button class="app-nav-btn" id="navPending" type="button">Pendientes</button>
+          <button class="app-nav-btn" id="navAnswered" type="button">Respondidas</button>
+          <button class="app-nav-btn" id="navDiscarded" type="button">Descartadas</button>
+          <div class="app-nav-label">EQUIPO</div>
+          <button class="app-nav-btn" id="navAssistants" type="button">Asistentes sociales</button>
+          <div class="app-sidebar-foot">Trabajo social<small>Coordinación de donaciones</small></div>
+        </aside>
+        <main class="app-main">
+      <section id="summaryView" aria-labelledby="summaryTitle">
+        <h1 id="summaryTitle">Resumen general</h1>
+        <p class="summary-subtitle">Vista general de la actividad y la atención de donaciones.</p>
+        <div class="dashboard-summary" aria-label="Indicadores generales">
+          <div class="summary-card"><span>Donaciones totales</span><strong id="summaryTotal">0</strong><small>Ingresos registrados</small></div>
+          <div class="summary-card"><span>Pendientes</span><strong id="summaryPending">0</strong><small>Requieren seguimiento</small></div>
+          <div class="summary-card"><span>Descartadas</span><strong id="summaryDiscarded">0</strong><small>Con motivo registrado</small></div>
+          <div class="summary-card"><span>Con respuesta</span><strong id="summaryAnswered">0</strong><small>Donadores contactados</small></div>
+        </div>
+        <div class="summary-chart-grid">
+          <div class="dashboard-panel summary-chart-wide"><h3>Donaciones recibidas</h3><p>Evolución de los últimos seis meses</p><div class="dashboard-chart" id="monthlyChart" aria-label="Donaciones recibidas por mes"></div></div>
+          <div class="dashboard-panel"><h3>Donaciones por categoría</h3><p>Volumen de artículos recibidos</p><div class="dashboard-chart" id="categoryChart" aria-label="Donaciones por categoría"></div></div>
+          <div class="dashboard-panel"><h3>Estado de atención</h3><p>Distribución actual de los casos</p><div class="dashboard-chart" id="statusChart" aria-label="Estado de atención de donaciones"></div></div>
+          <div class="dashboard-panel summary-chart-wide"><h3>Carga de trabajo</h3><p>Casos activos por asistente social</p><div class="dashboard-chart" id="loadChart" aria-label="Carga de trabajo por asistente"></div></div>
+        </div>
+      </section>
       <div id="principalPanel" class="admin-panel" style="display:none;">
-        <h3>Gestión de asistentes (solo principal)</h3>
-        <p class="hint" style="margin:0 0 10px;">Desde acá podés crear asistentes secundarios para que también ingresen al panel.</p>
+        <div class="assistant-module-header">
+          <h3>Gestión de asistentes (solo principal)</h3>
+          <button id="btnOpenAssistantForm" class="btn btn-primary" type="button">Agregar asistente</button>
+        </div>
+        <p class="hint" style="margin:0 0 10px;">Administrá los asistentes que pueden ingresar al panel.</p>
+        <div class="section-title" style="margin-top:18px;">Asistentes agregados</div>
+        <div id="assistantList" class="donation-list"></div>
+      </div>
+      <div id="assistantFormModal" class="admin-panel" style="display:none;">
+        <div class="assistant-form-header">
+          <h3>Agregar asistente</h3>
+          <button id="btnCloseAssistantModal" class="btn btn-secondary" type="button" aria-label="Cerrar formulario de asistente">Cerrar</button>
+        </div>
+        <p class="hint" style="margin:0 0 10px;">Creá un asistente secundario para que pueda ingresar al panel.</p>
         <div class="grid-2">
           <div>
             <label for="newAssistantUser">Nuevo usuario</label>
@@ -862,44 +1221,50 @@
         <input id="newAssistantPass" type="password" placeholder="Contraseña para el asistente">
         <button id="btnCreateAssistant" class="btn btn-primary" style="margin-top:12px;">Agregar asistente</button>
         <div id="assistantCreateMsg"></div>
-
-        <div class="section-title" style="margin-top:18px;">Asistentes agregados</div>
-        <div id="assistantList" class="donation-list"></div>
       </div>
       <div id="donationsView">
         <div class="toolbar">
           <h2>Donaciones recibidas</h2>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btnRefresh" class="btn btn-secondary">Actualizar listado</button>
-            <button id="btnToggleAI" class="btn btn-secondary" style="background: rgba(184,92,56,0.08); border-color: rgba(184,92,56,0.4); color: var(--terracotta);">Asistente IA</button>
           </div>
         </div>
-        <div class="filters-row">
-          <input id="filterDateFrom" type="date" title="Fecha desde">
-          <input id="filterDateTo" type="date" title="Fecha hasta">
-          <select id="filterCategory" title="Filtrar por categoría">
-            <option value="">Todas las categorías</option>
-          </select>
-          <input id="filterNumber" type="text" placeholder="Nro de donación (ej: 002 o #002)" title="Buscar por número de donación">
-          <select id="sortBy" title="Ordenar resultados">
-            <option value="date_desc">Fecha: más reciente</option>
-            <option value="date_asc">Fecha: más antigua</option>
-            <option value="number_asc">Número: menor a mayor</option>
-            <option value="number_desc">Número: mayor a menor</option>
-          </select>
-        </div>
-        <div style="margin-bottom:8px;">
-          <button id="btnClearFilters" class="btn btn-secondary" type="button">Limpiar filtros</button>
-        </div>
+        <details class="filters-details">
+          <summary class="btn btn-secondary filters-toggle">Filtros</summary>
+          <div class="filters-row">
+            <input id="filterDateFrom" type="date" title="Fecha desde">
+            <input id="filterDateTo" type="date" title="Fecha hasta">
+            <select id="filterCategory" title="Filtrar por categoría">
+              <option value="">Todas las categorías</option>
+            </select>
+            <input id="filterNumber" type="text" placeholder="Nro. donación: #007" title="Buscar por número correlativo de donación">
+            <input id="filterTrackingNumber" type="text" placeholder="Nro. seguimiento: MC-2026-007" title="Buscar por código de seguimiento">
+            <select id="sortBy" title="Ordenar resultados">
+              <option value="date_desc">Fecha: más reciente</option>
+              <option value="date_asc">Fecha: más antigua</option>
+              <option value="number_asc">Número: menor a mayor</option>
+              <option value="number_desc">Número: mayor a menor</option>
+            </select>
+          </div>
+          <div style="margin-top:8px;">
+            <button id="btnClearFilters" class="btn btn-secondary" type="button">Limpiar filtros</button>
+          </div>
+        </details>
         
-        <!-- Panel de IA -->
+        <div class="tabs">
+          <button id="tabPending" class="tab-btn active" type="button">Pendientes</button>
+          <button id="tabAnswered" class="tab-btn" type="button">Respondidas</button>
+          <button id="tabDiscarded" class="tab-btn" type="button">Descartadas</button>
+        </div>
+        <div class="section-title" id="currentSectionTitle">Pendientes</div>
+        <div id="currentDonationList" class="donation-list"></div>
+      </div>
+        <button id="btnToggleAI" class="btn ai-fab" type="button" aria-label="Abrir asistente IA" title="Abrir asistente IA">💬</button>
         <div id="aiPanel" class="card" style="margin-bottom: 16px;">
           <div style="margin-bottom: 14px;">
             <button id="btnCloseAI" class="btn btn-secondary" style="width: auto; font-size: 12px;">✕ Cerrar IA</button>
           </div>
-          
           <div class="ai-container">
-            <!-- Sección de Chat -->
             <div class="ai-chat-section">
               <h3>Agente IA</h3>
               <div class="ai-chat-messages" id="aiChatMessages">
@@ -916,42 +1281,23 @@
                 </div>
               </div>
               <div class="ai-input-group">
-                <input 
-                  type="text" 
-                  id="aiChatInput" 
-                  placeholder="Ej: ¿Cuántas donaciones de alimentos hay?"
-                  title="Escribe una pregunta en lenguaje natural"
-                />
+                <input id="aiChatInput" type="text" placeholder="Ej: ¿Cuántas donaciones de alimentos hay?" title="Escribe una pregunta en lenguaje natural" />
                 <button id="btnSendAIQuestion" class="btn btn-primary" style="font-size: 12px;">Enviar</button>
                 <button id="btnClearAIChat" class="btn btn-secondary" style="font-size: 12px; margin-left:8px;">Borrar chat</button>
               </div>
             </div>
-            
-            <!-- Sección de Sugerencias -->
-            <div class="ai-suggestions-section">
-              <h3>Sugerencias</h3>
-              <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                <button id="btnPrioritize" class="btn btn-secondary" style="flex: 1; font-size: 12px;">Priorizar donaciones</button>
-              </div>
-              <div class="suggestions-container" id="aiSuggestions">
-                <div class="ai-empty">
-                  <p>Las sugerencias aparecerán aquí cuando:</p>
-                  <ul style="text-align: left; margin-top: 8px; font-size: 12px;">
-                    <li>Selecciones una donación del lado izquierdo</li>
-                    <li>La IA analizará los datos para proponer asignaciones</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-        <!-- Fin Panel de IA -->
-        <div class="tabs">
-          <button id="tabPending" class="tab-btn active" type="button">Pendientes</button>
-          <button id="tabDiscarded" class="tab-btn" type="button">Descartadas</button>
+        <div id="aiSuggestionsPanel" class="ai-suggestions-floating" aria-live="polite">
+          <h3>Sugerencias</h3>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+            <button id="btnPrioritize" class="btn btn-secondary" style="flex: 1; font-size: 12px;">Priorizar donaciones</button>
+          </div>
+          <div class="suggestions-container" id="aiSuggestions">
+            <div class="ai-empty">Abrí una donación para ver sugerencias.</div>
+          </div>
         </div>
-        <div class="section-title" id="currentSectionTitle">Pendientes</div>
-        <div id="currentDonationList" class="donation-list"></div>
+        </main>
       </div>
     </div>
   </div>
@@ -983,11 +1329,15 @@
 
     const panelLogin = document.getElementById("panelLogin");
     const panelApp = document.getElementById("panelApp");
+    const summaryView = document.getElementById("summaryView");
     const donationsView = document.getElementById("donationsView");
     const btnLogout = document.getElementById("btnLogout");
     const btnAssistantManager = document.getElementById("btnAssistantManager");
+    const btnOpenAssistantForm = document.getElementById("btnOpenAssistantForm");
+    const btnCloseAssistantModal = document.getElementById("btnCloseAssistantModal");
     const loginMsg = document.getElementById("loginMsg");
     const principalPanel = document.getElementById("principalPanel");
+    const assistantFormModal = document.getElementById("assistantFormModal");
     const assistantCreateMsg = document.getElementById("assistantCreateMsg");
     const newAssistantUser = document.getElementById("newAssistantUser");
     const newAssistantName = document.getElementById("newAssistantName");
@@ -996,13 +1346,23 @@
     const assistantList = document.getElementById("assistantList");
     const currentDonationList = document.getElementById("currentDonationList");
     const currentSectionTitle = document.getElementById("currentSectionTitle");
+    const summaryTotal = document.getElementById("summaryTotal");
+    const summaryPending = document.getElementById("summaryPending");
+    const summaryDiscarded = document.getElementById("summaryDiscarded");
+    const summaryAnswered = document.getElementById("summaryAnswered");
+    const categoryChart = document.getElementById("categoryChart");
+    const statusChart = document.getElementById("statusChart");
+    const monthlyChart = document.getElementById("monthlyChart");
+    const loadChart = document.getElementById("loadChart");
     const filterDateFrom = document.getElementById("filterDateFrom");
     const filterDateTo = document.getElementById("filterDateTo");
     const filterCategory = document.getElementById("filterCategory");
     const filterNumber = document.getElementById("filterNumber");
+    const filterTrackingNumber = document.getElementById("filterTrackingNumber");
     const sortBy = document.getElementById("sortBy");
     const btnClearFilters = document.getElementById("btnClearFilters");
     const tabPending = document.getElementById("tabPending");
+    const tabAnswered = document.getElementById("tabAnswered");
     const tabDiscarded = document.getElementById("tabDiscarded");
     const toastEl = document.getElementById("toast");
     const toastTitleEl = document.getElementById("toastTitle");
@@ -1010,6 +1370,7 @@
     
     // Elementos del panel de IA
     const aiPanel = document.getElementById("aiPanel");
+    const aiSuggestionsPanel = document.getElementById("aiSuggestionsPanel");
     const btnToggleAI = document.getElementById("btnToggleAI");
     const btnCloseAI = document.getElementById("btnCloseAI");
     const aiChatMessages = document.getElementById("aiChatMessages");
@@ -1020,12 +1381,13 @@
     let activeTab = "pending";
     let cachedDonations = [];
     let currentAssistant = null;
-    let activeAppView = "donations";
+    let activeAppView = "summary";
     let toastTimer = null;
     let aiAssistant = null;
     let aiPanelVisible = false;
     let aiConversation = [];
     let selectedDonationForSuggestions = null;
+    let dashboardCharts = {};
     const TRACKING_STATUS_OPTIONS = [
       "Pendiente de coordinación",
       "Para retirar",
@@ -1310,6 +1672,27 @@
       return Number.isFinite(seq) && seq > 0 ? seq : index + 1;
     }
 
+    function matchesDonationNumber(item, index, rawQuery) {
+      const query = String(rawQuery || "").trim().toLowerCase().replace(/^#\s*/, "");
+      if (!query) return true;
+
+      const numericQuery = query.replace(/\D/g, "");
+      if (!numericQuery) return false;
+
+      const queryNumber = Number(numericQuery);
+      if (!Number.isFinite(queryNumber)) return false;
+
+      const sequence = getDonationNumber(item, index);
+      return sequence === queryNumber;
+    }
+
+    function matchesTrackingNumber(item, rawQuery) {
+      const query = String(rawQuery || "").trim().toLowerCase();
+      if (!query) return true;
+      const trackingCode = String(item.code || "").trim().toLowerCase();
+      return trackingCode === query || trackingCode.includes(query);
+    }
+
     function getIsoDateOnly(isoDate) {
       if (!isoDate) return "";
       const date = new Date(isoDate);
@@ -1331,7 +1714,8 @@
       const from = filterDateFrom.value;
       const to = filterDateTo.value;
       const category = filterCategory.value.trim().toLowerCase();
-      const numberQuery = filterNumber.value.trim().replace("#", "");
+      const numberQuery = filterNumber.value;
+      const trackingNumberQuery = filterTrackingNumber.value;
       const filtered = donations.filter((item, index) => {
         const donationDate = getIsoDateOnly(item.createdAt);
         if (from && donationDate && donationDate < from) return false;
@@ -1343,9 +1727,10 @@
         }
 
         if (numberQuery) {
-          const number = String(getDonationNumber(item, index)).padStart(3, "0");
-          if (!number.includes(numberQuery) && !String(Number(number)).includes(numberQuery)) return false;
+          if (!matchesDonationNumber(item, index, numberQuery)) return false;
         }
+
+        if (trackingNumberQuery && !matchesTrackingNumber(item, trackingNumberQuery)) return false;
 
         return true;
       });
@@ -1385,6 +1770,73 @@
       });
     }
 
+    function svgEscape(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+
+    function renderSvgChart(container, svg) {
+      if (container) container.innerHTML = svg;
+    }
+
+    function donationHasResponse(donation) {
+      return Boolean(donation.response?.message);
+    }
+
+    function renderDashboardSummary(donations) {
+      const pending = donations.filter((item) => item.status === "pending" && !donationHasResponse(item));
+      const discarded = donations.filter((item) => item.status === "discarded");
+      const answered = donations.filter((item) => item.status !== "discarded" && donationHasResponse(item));
+      summaryTotal.textContent = donations.length;
+      summaryPending.textContent = pending.length;
+      summaryDiscarded.textContent = discarded.length;
+      summaryAnswered.textContent = answered.length;
+
+      const categories = {};
+      donations.forEach((item) => getDonationItems(item).forEach((donation) => {
+        const category = donation.categoria || "No informada";
+        categories[category] = (categories[category] || 0) + 1;
+      }));
+      const categoryLabels = Object.keys(categories).sort((a, b) => categories[b] - categories[a]);
+      const maxCategory = Math.max(1, ...categoryLabels.map((label) => categories[label]));
+      const categoryBars = categoryLabels.map((label, index) => {
+        const y = 18 + index * 27;
+        const barWidth = Math.max(2, (categories[label] / maxCategory) * 300);
+        return `<text x="0" y="${y + 12}" fill="#6B6558" font-size="11">${svgEscape(label).slice(0, 24)}</text><rect x="145" y="${y}" width="${barWidth}" height="16" rx="5" fill="#2C5F4C"/><text x="${145 + barWidth}" dx="7" y="${y + 12}" fill="#173226" font-size="11" font-weight="600">${categories[label]}</text>`;
+      }).join("");
+      renderSvgChart(categoryChart, `<svg viewBox="0 0 520 ${Math.max(170, categoryLabels.length * 27 + 20)}" preserveAspectRatio="none" role="img">${categoryBars || '<text x="10" y="80" fill="#948E7F" font-size="13">Sin datos todavía</text>'}</svg>`);
+
+      const statusTotal = Math.max(1, pending.length + discarded.length);
+      const statusBars = [["Pendientes", pending.length, "#C8932E"], ["Descartadas", discarded.length, "#A24A3F"]].map((entry, index) => {
+        const y = 30 + index * 58;
+        const width = (entry[1] / statusTotal) * 66;
+        return `<text x="0" y="${y}" fill="#6B6558" font-size="12">${entry[0]}</text><rect x="0" y="${y + 10}" width="66%" height="20" rx="6" fill="#EFF5F0"/><rect x="0" y="${y + 10}" width="${Math.max(1, width)}%" height="20" rx="6" fill="${entry[2]}"/><text x="69%" y="${y + 25}" fill="#173226" font-size="13" font-weight="600">${entry[1]}</text>`;
+      }).join("");
+      renderSvgChart(statusChart, `<svg viewBox="0 0 520 170" preserveAspectRatio="none" role="img">${statusBars}</svg>`);
+
+      const monthKeys = [];
+      const monthLabels = [];
+      const today = new Date();
+      for (let offset = 5; offset >= 0; offset -= 1) {
+        const month = new Date(today.getFullYear(), today.getMonth() - offset, 1);
+        monthKeys.push(`${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}`);
+        monthLabels.push(month.toLocaleDateString("es-AR", { month: "short" }).replace(".", ""));
+      }
+      const monthlyValues = monthKeys.map((key) => donations.filter((item) => getIsoDateOnly(item.createdAt).startsWith(key)).length);
+      const maxMonthly = Math.max(1, ...monthlyValues);
+      const points = monthlyValues.map((value, index) => `${35 + index * 140},${175 - (value / maxMonthly) * 135}`).join(" ");
+      const pointDots = monthlyValues.map((value, index) => `<circle cx="${35 + index * 140}" cy="${175 - (value / maxMonthly) * 135}" r="5" fill="#C1592E"/><text x="${35 + index * 140}" y="208" text-anchor="middle" fill="#6B6558" font-size="11">${monthLabels[index]}</text>`).join("");
+      renderSvgChart(monthlyChart, `<svg viewBox="0 0 760 220" preserveAspectRatio="none" role="img"><line x1="25" y1="175" x2="735" y2="175" stroke="#E4DDC9"/><polyline points="${points}" fill="none" stroke="#C1592E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>${pointDots}</svg>`);
+
+      const responseValues = [["Con respuesta", answered.length, "#2C5F4C"], ["Sin respuesta", donations.length - answered.length, "#C8932E"]];
+      const maxResponse = Math.max(1, ...responseValues.map((entry) => entry[1]));
+      const responseBars = responseValues.map((entry, index) => {
+        const x = 75 + index * 210;
+        const height = (entry[1] / maxResponse) * 125;
+        return `<rect x="${x}" y="${165 - height}" width="90" height="${height}" rx="7" fill="${entry[2]}"/><text x="${x + 45}" y="185" text-anchor="middle" fill="#6B6558" font-size="11">${entry[0]}</text><text x="${x + 45}" y="${155 - height}" text-anchor="middle" fill="#173226" font-size="13" font-weight="600">${entry[1]}</text>`;
+      }).join("");
+      renderSvgChart(loadChart, `<svg viewBox="0 0 520 210" preserveAspectRatio="none" role="img"><line x1="35" y1="165" x2="485" y2="165" stroke="#E4DDC9"/>${responseBars}</svg>`);
+    }
+
     function showLoginError(message) {
       loginMsg.className = "error";
       loginMsg.textContent = message;
@@ -1403,8 +1855,11 @@
         return;
       }
       cachedDonations = donations;
+      renderDashboardSummary(donations);
       currentDonationList.innerHTML = "";
-      currentSectionTitle.textContent = activeTab === "discarded" ? "Descartadas" : "Pendientes";
+      currentSectionTitle.textContent = activeTab === "discarded"
+        ? "Descartadas"
+        : activeTab === "answered" ? "Respondidas" : "Pendientes";
 
       if (!donations.length) {
         currentDonationList.innerHTML = '<div class="empty">Todavía no hay donaciones cargadas desde el formulario principal.</div>';
@@ -1454,6 +1909,8 @@
         const article = document.createElement("article");
         article.className = "donation-item";
         article.innerHTML = `
+          <details class="donation-details">
+            <summary>
           <div class="meta">
             <span>${formatDate(item.createdAt)}</span>
             <strong>${item.code || "Sin código"}</strong>
@@ -1465,6 +1922,8 @@
           <div style="font-size:13px; margin-bottom:10px;">
             <strong>Estado de seguimiento:</strong> ${fmt(trackingStatus, "name")}
           </div>
+            </summary>
+            <div class="donation-details-body">
           ${photosHtml}
           <div style="margin-bottom:8px;">${itemsHtml}</div>
           <div style="font-size:13px; line-height:1.45;">
@@ -1497,12 +1956,29 @@
             </div>
             ${responseText ? `<div class="resp-history"><strong>Última respuesta:</strong> ${responseDisplay}<br><small>Actualizada: ${responseDate}</small></div>` : ""}
           </div>
+            </div>
+          </details>
         `;
         const isDiscarded = item.status === "discarded";
-        if ((activeTab === "discarded" && isDiscarded) || (activeTab === "pending" && !isDiscarded)) {
+        const hasResponse = donationHasResponse(item);
+        const belongsToTab = activeTab === "discarded"
+          ? isDiscarded
+          : !isDiscarded && (activeTab === "answered" ? hasResponse : !hasResponse);
+        if (belongsToTab) {
           currentDonationList.appendChild(article);
           
-          // Agregar evento para cargar sugerencias de IA cuando se haga click
+          const donationDetails = article.querySelector(".donation-details");
+          donationDetails?.addEventListener("toggle", () => {
+            if (donationDetails.open) {
+              if (!aiAssistant) initializeAI();
+              aiSuggestionsPanel.classList.add("visible");
+              loadDonationSuggestions(donationId);
+            } else {
+              aiSuggestionsPanel.classList.remove("visible");
+            }
+          });
+
+          // Seleccionar la donación también actualiza las sugerencias cuando el chat está abierto.
           article.style.cursor = "pointer";
           article.addEventListener("click", () => {
             if (aiPanelVisible && aiAssistant) {
@@ -1517,7 +1993,9 @@
       if (!visibleCount) {
         currentDonationList.innerHTML = `<div class="empty">${
           filteredDonations.length
-            ? (activeTab === "discarded" ? "No hay donaciones descartadas." : "No hay donaciones pendientes.")
+            ? (activeTab === "discarded"
+              ? "No hay donaciones descartadas."
+              : activeTab === "answered" ? "No hay donaciones respondidas." : "No hay donaciones pendientes.")
             : "No hay resultados con esos filtros."
         }</div>`;
       }
@@ -1611,7 +2089,7 @@
     }
 
     function setupFilters() {
-      [filterDateFrom, filterDateTo, filterCategory, filterNumber, sortBy].forEach((el) => {
+      [filterDateFrom, filterDateTo, filterCategory, filterNumber, filterTrackingNumber, sortBy].forEach((el) => {
         el.addEventListener("input", renderDonations);
         el.addEventListener("change", renderDonations);
       });
@@ -1620,6 +2098,7 @@
         filterDateTo.value = "";
         filterCategory.value = "";
         filterNumber.value = "";
+        filterTrackingNumber.value = "";
         sortBy.value = "date_desc";
         renderDonations();
       });
@@ -1628,6 +2107,7 @@
     function setActiveTab(tab) {
       activeTab = tab;
       tabPending.classList.toggle("active", tab === "pending");
+      tabAnswered.classList.toggle("active", tab === "answered");
       tabDiscarded.classList.toggle("active", tab === "discarded");
       renderDonations();
     }
@@ -1662,18 +2142,25 @@
     function updatePrincipalPanelVisibility() {
       const isPrincipal = !!currentAssistant?.is_primary;
       btnAssistantManager.style.display = isPrincipal ? "inline-block" : "none";
-      if (!isPrincipal) {
-        activeAppView = "donations";
+      if (!isPrincipal && activeAppView === "assistants") {
+        activeAppView = "summary";
       }
       principalPanel.style.display = isPrincipal && activeAppView === "assistants" ? "block" : "none";
+      summaryView.style.display = activeAppView === "summary" ? "block" : "none";
       donationsView.style.display = activeAppView === "donations" ? "block" : "none";
       btnAssistantManager.textContent = activeAppView === "assistants" ? "Ver donaciones" : "Gestión de asistentes";
     }
 
     function setAppView(view) {
       activeAppView = view;
+      if (view !== "donations") {
+        aiSuggestionsPanel.classList.remove("visible");
+      }
       updatePrincipalPanelVisibility();
       if (view === "donations") {
+        renderDonations();
+      }
+      if (view === "summary") {
         renderDonations();
       }
       if (view === "assistants") {
@@ -1690,7 +2177,7 @@
       panelLogin.style.display = "none";
       panelApp.style.display = "block";
       btnLogout.style.display = "inline-block";
-      activeAppView = "donations";
+      activeAppView = "summary";
       updatePrincipalPanelVisibility();
       initializeAI();
       renderDonations();
@@ -1701,6 +2188,17 @@
       panelApp.style.display = "none";
       btnLogout.style.display = "none";
       btnAssistantManager.style.display = "none";
+    }
+
+    function keepPageAtTop() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
     }
 
     document.getElementById("btnLogin").addEventListener("click", () => {
@@ -1734,9 +2232,11 @@
     document.getElementById("btnRefresh").addEventListener("click", renderDonations);
     setupFilters();
     tabPending.addEventListener("click", () => setActiveTab("pending"));
+    tabAnswered.addEventListener("click", () => setActiveTab("answered"));
     tabDiscarded.addEventListener("click", () => setActiveTab("discarded"));
 
     btnLogout.addEventListener("click", () => {
+      keepPageAtTop();
       setSession(null);
       document.getElementById("usuario").value = "";
       document.getElementById("clave").value = "";
@@ -1777,7 +2277,80 @@
 
     btnAssistantManager.addEventListener("click", () => {
       if (!currentAssistant?.is_primary) return;
+      keepPageAtTop();
       setAppView(activeAppView === "assistants" ? "donations" : "assistants");
+      window.setTimeout(keepPageAtTop, 0);
+    });
+
+    btnOpenAssistantForm.addEventListener("click", () => {
+      assistantCreateMsg.textContent = "";
+      assistantFormModal.style.display = "block";
+    });
+
+    btnCloseAssistantModal.addEventListener("click", () => {
+      assistantFormModal.style.display = "none";
+    });
+
+    const appNavButtons = {
+      summary: document.getElementById("navSummary"),
+      pending: document.getElementById("navPending"),
+      answered: document.getElementById("navAnswered"),
+      discarded: document.getElementById("navDiscarded"),
+      assistants: document.getElementById("navAssistants")
+    };
+    const appShell = document.querySelector(".app-shell");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    function setSidebarCollapsed(collapsed, persist = true) {
+      if (!appShell || !sidebarToggle) return;
+      appShell.classList.toggle("sidebar-collapsed", collapsed);
+      sidebarToggle.textContent = collapsed ? "›" : "‹";
+      sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+      sidebarToggle.setAttribute("aria-label", collapsed ? "Mostrar menú lateral" : "Ocultar menú lateral");
+      if (persist) localStorage.setItem("manosConectadasSidebarCollapsed", String(collapsed));
+    }
+
+    setSidebarCollapsed(localStorage.getItem("manosConectadasSidebarCollapsed") === "true", false);
+    sidebarToggle?.addEventListener("click", () => {
+      setSidebarCollapsed(!appShell.classList.contains("sidebar-collapsed"));
+    });
+
+    function activateAppNav(name) {
+      Object.entries(appNavButtons).forEach(([key, button]) => {
+        if (button) button.classList.toggle("active", key === name);
+      });
+    }
+
+    appNavButtons.summary?.addEventListener("click", () => {
+      activateAppNav("summary");
+      setAppView("summary");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    appNavButtons.pending?.addEventListener("click", () => {
+      activateAppNav("pending");
+      setAppView("donations");
+      setActiveTab("pending");
+      window.setTimeout(keepPageAtTop, 0);
+    });
+    appNavButtons.answered?.addEventListener("click", () => {
+      activateAppNav("answered");
+      setAppView("donations");
+      setActiveTab("answered");
+      window.setTimeout(keepPageAtTop, 0);
+    });
+    appNavButtons.discarded?.addEventListener("click", () => {
+      activateAppNav("discarded");
+      setAppView("donations");
+      setActiveTab("discarded");
+      window.setTimeout(keepPageAtTop, 0);
+    });
+    appNavButtons.assistants?.addEventListener("click", () => {
+      if (!currentAssistant?.is_primary) {
+        showToast("Solo el asistente principal puede gestionar el equipo.", "error", "Acceso restringido", 3000);
+        return;
+      }
+      activateAppNav("assistants");
+      setAppView("assistants");
     });
 
     // ========== Funciones para el Panel de IA ==========
@@ -1787,12 +2360,18 @@
       aiAssistant = new AIAssistant(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
+    function renderAIWelcome() {
+      aiChatMessages.innerHTML = "";
+      addAIMessage("Hola, soy el asistente de Manos Conectadas. Estoy acá para ayudarte a consultar y organizar las donaciones.");
+      addAIMessage("Podés preguntarme, por ejemplo:\n• cuántas donaciones pendientes hay\n• qué donaciones son de alimentos\n• cuál necesita atención prioritaria\n• buscar una donación por su código", "assistant");
+    }
+
     function toggleAIPanel() {
       aiPanelVisible = !aiPanelVisible;
       aiPanel.style.display = aiPanelVisible ? "block" : "none";
       if (aiPanelVisible) {
         aiChatInput.focus();
-        aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
+        renderAIWelcome();
         loadQuestionsList();
       }
     }
@@ -1936,7 +2515,7 @@
     }
 
     function clearAIChat() {
-      aiChatMessages.innerHTML = '<div class="ai-empty">Haz preguntas sobre las donaciones...</div>';
+      renderAIWelcome();
       aiConversation = [];
       if (aiChatInput) {
         aiChatInput.value = "";
