@@ -1160,22 +1160,56 @@ textarea { resize: vertical; min-height: 100px; }
 .chat-send:disabled { opacity: 0.5; cursor: wait; }
 
 /* Responsive */
-@media (max-width: 768px) {
-  nav { padding: 0 12px; gap: 10px; }
-  .nav-logo { font-size: 18px; }
-  .nav-end { gap: 0; }
-  .nav-links { display: none; }
-  .nav-cta {
-    padding: 8px 14px;
-    font-size: 13px;
+@media (max-width: 900px) {
+  nav {
+    padding: 0 14px;
+    height: auto;
+    min-height: 64px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
-  .hero-strip { grid-template-columns: 1fr; padding: 60px 20px 0; }
-  .hero-illustration { display: none; }
-  .main-wrap { padding: 60px 20px 80px; }
+
+  .nav-end {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .nav-links { display: none; }
+
+  .nav-track-btn,
+  .nav-cta {
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+
+  .hero-strip {
+    margin-top: 64px;
+    grid-template-columns: 1fr;
+    padding: 52px 20px 0;
+    gap: 28px;
+  }
+
+  .hero-text-wrap {
+    padding-bottom: 18px;
+  }
+
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 20px 28px;
+    margin-top: 28px;
+    padding-top: 22px;
+  }
+
+  .hero-illustration {
+    display: none;
+  }
+
+  .main-wrap { padding: 64px 18px 80px; }
   .page-layout { grid-template-columns: 1fr; }
   .sidebar { display: none; }
   .form-grid { grid-template-columns: 1fr; }
-  .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ubicacion-opts { grid-template-columns: 1fr; }
   .steps-row { gap: 4px; }
   .step-connector { width: 20px; }
@@ -1183,6 +1217,105 @@ textarea { resize: vertical; min-height: 100px; }
   .photo-preview-grid { grid-template-columns: repeat(3, 1fr); }
   .chat-widget { right: 16px; bottom: 16px; }
   .chat-panel { bottom: 70px; height: min(470px, calc(100vh - 110px)); }
+}
+
+@media (max-width: 560px) {
+  nav {
+    padding: 10px 12px;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+
+  .nav-end {
+    width: auto;
+    margin-left: 0;
+    gap: 6px;
+  }
+
+  .nav-track-btn,
+  .nav-cta {
+    min-height: 40px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .hero-strip {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .hero-h1 {
+    font-size: clamp(34px, 11vw, 46px);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .hero-stats {
+    gap: 16px 18px;
+  }
+
+  .hstat-num {
+    font-size: 24px;
+  }
+
+  .main-wrap {
+    padding: 38px 14px 72px;
+  }
+
+  .card,
+  .summary-box,
+  .intro-card,
+  .donation-form,
+  .status-card {
+    border-radius: 10px;
+  }
+
+  .form-row,
+  .grid-2,
+  .chip-row,
+  .cat-grid,
+  .ubicacion-opts,
+  .photo-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .donation-form,
+  .form-panel,
+  .status-card {
+    padding: 16px;
+  }
+
+  .action-row,
+  .stack-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-submit,
+  .btn-next,
+  .track-btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .chat-widget { right: 12px; bottom: 12px; }
+  .chat-panel {
+    right: 0;
+    bottom: 68px;
+    width: min(360px, calc(100vw - 20px));
+    height: min(440px, calc(100vh - 120px));
+  }
 }
 </style>
 </head>

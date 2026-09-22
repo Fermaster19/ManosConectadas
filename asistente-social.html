@@ -929,6 +929,92 @@
       }
     }
 
+    @media (max-width: 560px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .wrap {
+        padding: 94px 12px 20px;
+      }
+
+      .card,
+      .dashboard-panel,
+      .summary-card,
+      .donation-item,
+      .ai-container,
+      .ai-panel {
+        border-radius: 10px;
+      }
+
+      .topbar {
+        min-height: 72px;
+        padding: 10px 12px;
+      }
+
+      .topbar-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .topbar-actions .btn,
+      .topbar-actions a.btn {
+        flex: 1 1 0;
+        min-width: 0;
+        text-align: center;
+      }
+
+      .login-box {
+        margin-top: 8px;
+        padding: 18px 14px;
+      }
+
+      .hint,
+      .social-work-note,
+      .suggestion-reason,
+      .donation-meta,
+      .empty-state {
+        font-size: 12px;
+      }
+
+      .dashboard-summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .filters-row {
+        grid-template-columns: 1fr;
+      }
+
+      .donation-list {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-widget {
+        right: 12px;
+        bottom: 12px;
+      }
+
+      .chat-panel {
+        width: min(350px, calc(100vw - 18px));
+        height: min(440px, calc(100vh - 110px));
+        right: 0;
+        bottom: 70px;
+      }
+
+      .chat-form {
+        flex-direction: column;
+      }
+
+      .chat-send {
+        min-height: 42px;
+      }
+    }
+
     /* Panel de gestión: lenguaje visual de la plantilla compartida */
     :root {
       --cream: #F7F3EA;
