@@ -282,6 +282,23 @@
       margin-bottom: 10px;
     }
 
+    .expiry-alerts-panel { grid-column: 1 / -1; }
+    .expiry-alert-counts { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .expiry-count, .expiry-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .expiry-count.expired, .expiry-badge.expired { background: #FCE8E4; color: #8A3027; }
+    .expiry-count.upcoming, .expiry-badge.upcoming { background: #FFF2D6; color: #79520B; }
+    .expiry-alert-list { display: grid; gap: 7px; }
+    .expiry-alert-row { padding: 9px 10px; border-left: 3px solid #C8932E; background: #FFF9EC; font-size: 13px; line-height: 1.45; }
+    .expiry-alert-row.expired { border-left-color: #A24A3F; background: #FFF3F0; }
+    .expiry-empty { color: var(--ink-60); font-size: 13px; }
+
     .dashboard-chart { height: 240px; position: relative; overflow: hidden; }
     .dashboard-chart svg { display: block; width: 100%; height: 100%; overflow: hidden; }
 
@@ -1272,6 +1289,15 @@
           <div class="summary-card"><span>Con respuesta</span><strong id="summaryAnswered">0</strong><small>Donadores contactados</small></div>
         </div>
         <div class="summary-chart-grid">
+          <div class="dashboard-panel expiry-alerts-panel">
+            <h3>Alertas de vencimiento</h3>
+            <p>Productos vencidos o que vencen en los próximos 30 días.</p>
+            <div class="expiry-alert-counts">
+              <span class="expiry-count expired" id="expiredItemCount">Vencidos: 0</span>
+              <span class="expiry-count upcoming" id="upcomingItemCount">Próximos a vencer: 0</span>
+            </div>
+            <div class="expiry-alert-list" id="expiryAlertList" aria-live="polite"></div>
+          </div>
           <div class="dashboard-panel summary-chart-wide"><h3>Donaciones recibidas</h3><p>Evolución de los últimos seis meses</p><div class="dashboard-chart" id="monthlyChart" aria-label="Donaciones recibidas por mes"></div></div>
           <div class="dashboard-panel"><h3>Donaciones por categoría</h3><p>Volumen de artículos recibidos</p><div class="dashboard-chart" id="categoryChart" aria-label="Donaciones por categoría"></div></div>
           <div class="dashboard-panel"><h3>Estado de atención</h3><p>Distribución actual de los casos</p><div class="dashboard-chart" id="statusChart" aria-label="Estado de atención de donaciones"></div></div>
@@ -1481,6 +1507,7 @@
       "En tránsito",
       "Entregada"
     ];
+    const EXPIRY_WARNING_DAYS = 30;
 
     function showToast(message, type = "ok", title = "Ingreso correcto", durationMs = 3000) {
       if (!toastEl) return;
@@ -1868,6 +1895,77 @@
       return Boolean(donation.response?.message);
     }
 
+    function getExpiryInfo(expirationDate) {
+      const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(expirationDate || ""));
+      if (!match) return null;
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      const expirationUtc = Date.UTC(year, month - 1, day);
+      const expiration = new Date(expirationUtc);
+      if (expiration.getUTCFullYear() !== year || expiration.getUTCMonth() !== month - 1 || expiration.getUTCDate() !== day) return null;
+
+      const today = new Date();
+      const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+      const daysRemaining = Math.round((expirationUtc - todayUtc) / 86400000);
+      if (daysRemaining < 0) return { type: "expired", daysRemaining, date: expiration };
+      if (daysRemaining <= EXPIRY_WARNING_DAYS) return { type: "upcoming", daysRemaining, date: expiration };
+      return null;
+    }
+
+    function formatExpiryStatus(expiryInfo) {
+      if (expiryInfo.type === "expired") {
+        const days = Math.abs(expiryInfo.daysRemaining);
+        return days === 1 ? "Vencido hace 1 día" : `Vencido hace ${days} días`;
+      }
+      if (expiryInfo.daysRemaining === 0) return "Vence hoy";
+      return expiryInfo.daysRemaining === 1
+        ? "Vence en 1 día"
+        : `Vence en ${expiryInfo.daysRemaining} días`;
+    }
+
+    function formatExpiryDate(date) {
+      return date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
+    }
+
+    function renderExpiryAlerts(donations) {
+      const expiredCount = document.getElementById("expiredItemCount");
+      const upcomingCount = document.getElementById("upcomingItemCount");
+      const alertList = document.getElementById("expiryAlertList");
+      const alerts = [];
+
+      donations.forEach((donation, index) => {
+        if (donation.status === "discarded") return;
+        getDonationItems(donation).forEach((item) => {
+          const expiryInfo = getExpiryInfo(item.fecha_vencimiento);
+          if (expiryInfo) alerts.push({ donation, item, index, expiryInfo });
+        });
+      });
+
+      alerts.sort((a, b) => a.expiryInfo.daysRemaining - b.expiryInfo.daysRemaining);
+      const expiredTotal = alerts.filter((alert) => alert.expiryInfo.type === "expired").length;
+      expiredCount.textContent = `Vencidos: ${expiredTotal}`;
+      upcomingCount.textContent = `Próximos a vencer: ${alerts.length - expiredTotal}`;
+      alertList.replaceChildren();
+
+      if (!alerts.length) {
+        const emptyMessage = document.createElement("div");
+        emptyMessage.className = "expiry-empty";
+        emptyMessage.textContent = "No hay productos vencidos ni próximos a vencer.";
+        alertList.appendChild(emptyMessage);
+        return;
+      }
+
+      alerts.forEach(({ donation, item, index, expiryInfo }) => {
+        const row = document.createElement("div");
+        row.className = `expiry-alert-row ${expiryInfo.type}`;
+        const donationNumber = String(getDonationNumber(donation, index)).padStart(3, "0");
+        const productName = item.objeto || "Producto sin nombre";
+        row.textContent = `${formatExpiryStatus(expiryInfo)}: ${productName} · Donación #${donationNumber} (${donation.code || "Sin código"}) · Vencimiento ${formatExpiryDate(expiryInfo.date)}`;
+        alertList.appendChild(row);
+      });
+    }
+
     function renderDashboardSummary(donations) {
       const pending = donations.filter((item) => item.status === "pending" && !donationHasResponse(item));
       const discarded = donations.filter((item) => item.status === "discarded");
@@ -1876,6 +1974,7 @@
       summaryPending.textContent = pending.length;
       summaryDiscarded.textContent = discarded.length;
       summaryAnswered.textContent = answered.length;
+      renderExpiryAlerts(donations);
 
       const categories = {};
       donations.forEach((item) => getDonationItems(item).forEach((donation) => {
@@ -1971,20 +2070,27 @@
         const extraItems = donationItems.length > 1 ? ` <span class="pill">+${donationItems.length - 1} más</span>` : "";
         const photoList = Array.isArray(item.photos) ? item.photos.filter(Boolean).slice(0, 3) : [];
         const trackingStatus = item.tracking_status || "Pendiente de coordinación";
+        const expirySummary = donationItems.map((donationItem) => getExpiryInfo(donationItem.fecha_vencimiento))
+          .filter(Boolean)
+          .map((expiryInfo) => `<span class="expiry-badge ${expiryInfo.type}">${formatExpiryStatus(expiryInfo)}</span>`)
+          .join(" ");
         const photosHtml = photoList.length
           ? `<div class="photo-list">${photoList.map((src, i) => `<img src="${src}" alt="Foto donación ${i + 1}">`).join("")}</div>`
           : "";
         const coord = item.coordination || {};
-        const itemsHtml = donationItems.map((d, i) => `
+        const itemsHtml = donationItems.map((d, i) => {
+          const expiryInfo = getExpiryInfo(d.fecha_vencimiento);
+          return `
           <div style="font-size:13px; line-height:1.45; margin-bottom:${i === donationItems.length - 1 ? "0" : "8px"};">
             <strong>${i + 1}. ${fmt(d.objeto || "Objeto sin nombre", "object")}</strong><br>
             <strong>Categoría:</strong> ${fmt(d.categoria || "No informada", "name")} ·
             <strong>Estado:</strong> ${fmt(d.estado || "Sin estado", "name")} ·
             <strong>Cantidad:</strong> ${fmt(d.cantidad || "No informada", "light")}
             ${d.descripcion ? `<br><strong>Descripción:</strong> ${fmt(d.descripcion, "sentence")}` : ""}
-            ${d.fecha_vencimiento ? `<br><strong>Vencimiento:</strong> ${TextCorrector ? TextCorrector.escapeHtml(d.fecha_vencimiento) : d.fecha_vencimiento}` : ""}
+            ${d.fecha_vencimiento ? `<br><strong>Vencimiento:</strong> ${TextCorrector ? TextCorrector.escapeHtml(d.fecha_vencimiento) : d.fecha_vencimiento}${expiryInfo ? ` <span class="expiry-badge ${expiryInfo.type}">${formatExpiryStatus(expiryInfo)}</span>` : ""}` : ""}
           </div>
-        `).join("");
+        `;
+        }).join("");
         const coordinationHtml = `
           ${coord.direccion ? `<br><strong>Dirección:</strong> ${fmt(coord.direccion, "sentence")}` : ""}
           ${coord.horario ? `<br><strong>Horario:</strong> ${fmt(coord.horario, "sentence")}` : ""}
@@ -2002,6 +2108,7 @@
             <strong>${item.code || "Sin código"}</strong>
           </div>
           <h3 style="margin-bottom:6px;">Donación #${String(donationNumber).padStart(3, "0")}${extraItems}</h3>
+          ${expirySummary ? `<div class="expiry-alert-counts">${expirySummary}</div>` : ""}
           <div style="font-size:13px; margin-bottom:8px;">
             <strong>Total de ítems:</strong> ${donationItems.length}
           </div>
