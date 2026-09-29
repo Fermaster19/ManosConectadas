@@ -845,6 +845,34 @@ textarea { resize: vertical; min-height: 100px; }
 .terms-text { font-size: 13px; color: var(--ink-60); line-height: 1.6; }
 .terms-text a { color: var(--forest-mid); text-decoration: underline; }
 
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 40px;
+  background: var(--forest);
+  color: var(--white);
+}
+.site-footer-brand { font-family: 'Lora', serif; font-size: 18px; font-weight: 600; }
+.site-footer-brand span { color: #E7A184; }
+.site-footer-note { margin-top: 5px; color: rgba(255,255,255,.72); font-size: 12px; }
+.site-footer-socials { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.site-footer-socials a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,.32);
+  border-radius: 6px;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s, border-color .2s;
+}
+.site-footer-socials a:hover { background: rgba(255,255,255,.12); border-color: var(--white); }
+
 /* BUTTONS */
 .btn-row {
   display: flex;
@@ -1243,6 +1271,9 @@ textarea { resize: vertical; min-height: 100px; }
 }
 
 @media (max-width: 560px) {
+  .site-footer { align-items: flex-start; flex-direction: column; gap: 18px; padding: 24px 20px; }
+  .site-footer-socials { width: 100%; }
+  .site-footer-socials a { flex: 1 1 auto; justify-content: center; }
   nav {
     padding: 10px 12px;
     align-items: center;
@@ -1849,6 +1880,17 @@ textarea { resize: vertical; min-height: 100px; }
   </div>
 
 </div>
+
+<footer class="site-footer">
+  <div>
+    <div class="site-footer-brand">Manos<span> Conectadas</span></div>
+    <p class="site-footer-note">Comunidad que acompaña y conecta.</p>
+  </div>
+  <nav class="site-footer-socials" aria-label="Redes sociales de Manos Conectadas">
+    <a href="https://www.facebook.com/ManosConectadas" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Manos Conectadas">Facebook · Manos Conectadas</a>
+    <a href="https://www.instagram.com/mano.conectada/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Manos Conectadas">Instagram · @mano.conectada</a>
+  </nav>
+</footer>
 
 <div class="chat-widget" id="chatWidget">
   <div class="chat-panel" role="dialog" aria-label="Asistente de Manos Conectadas">
