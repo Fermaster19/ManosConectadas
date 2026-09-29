@@ -1358,12 +1358,6 @@
             </select>
             <input id="filterNumber" type="text" placeholder="Nro. donación: #007" title="Buscar por número correlativo de donación">
             <input id="filterTrackingNumber" type="text" placeholder="Nro. seguimiento: MC-2026-007" title="Buscar por código de seguimiento">
-            <select id="sortBy" title="Ordenar resultados">
-              <option value="date_desc">Fecha: más reciente</option>
-              <option value="date_asc">Fecha: más antigua</option>
-              <option value="number_asc">Número: menor a mayor</option>
-              <option value="number_desc">Número: mayor a menor</option>
-            </select>
           </div>
           <div style="margin-top:8px;">
             <button id="btnClearFilters" class="btn btn-secondary" type="button">Limpiar filtros</button>
@@ -1478,7 +1472,6 @@
     const filterCategory = document.getElementById("filterCategory");
     const filterNumber = document.getElementById("filterNumber");
     const filterTrackingNumber = document.getElementById("filterTrackingNumber");
-    const sortBy = document.getElementById("sortBy");
     const btnClearFilters = document.getElementById("btnClearFilters");
     const tabPending = document.getElementById("tabPending");
     const tabAnswered = document.getElementById("tabAnswered");
@@ -1857,22 +1850,9 @@
 
       const withIndex = filtered.map((item) => ({ item, originalIndex: donations.indexOf(item) }));
       withIndex.sort((a, b) => {
-        const dateA = new Date(a.item.createdAt || 0).getTime();
-        const dateB = new Date(b.item.createdAt || 0).getTime();
         const numA = getDonationNumber(a.item, a.originalIndex);
         const numB = getDonationNumber(b.item, b.originalIndex);
-
-        switch (sortBy.value) {
-          case "date_asc":
-            return dateA - dateB;
-          case "number_asc":
-            return numA - numB;
-          case "number_desc":
-            return numB - numA;
-          case "date_desc":
-          default:
-            return dateB - dateA;
-        }
+        return numA - numB;
       });
 
       return withIndex.map((entry) => entry.item);
@@ -2290,7 +2270,7 @@
     }
 
     function setupFilters() {
-      [filterDateFrom, filterDateTo, filterCategory, filterNumber, filterTrackingNumber, sortBy].forEach((el) => {
+      [filterDateFrom, filterDateTo, filterCategory, filterNumber, filterTrackingNumber].forEach((el) => {
         el.addEventListener("input", renderDonations);
         el.addEventListener("change", renderDonations);
       });
@@ -2300,7 +2280,6 @@
         filterCategory.value = "";
         filterNumber.value = "";
         filterTrackingNumber.value = "";
-        sortBy.value = "date_desc";
         renderDonations();
       });
     }
