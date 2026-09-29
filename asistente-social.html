@@ -2014,6 +2014,7 @@
           <div style="margin-bottom:8px;">${itemsHtml}</div>
           <div style="font-size:13px; line-height:1.45;">
             <strong>Donador:</strong> ${donorName}<br>
+            <strong>Anonimato solicitado:</strong> ${item.donor?.anonymous ? "Sí, simbólico (nombre visible para el equipo)" : "No"}<br>
             <strong>Email:</strong> ${item.donor?.email ? (TextCorrector ? TextCorrector.escapeHtml(item.donor.email) : item.donor.email) : "No informado"}<br>
             <strong>Teléfono:</strong> ${item.donor?.telefono ? (TextCorrector ? TextCorrector.escapeHtml(item.donor.telefono) : item.donor.telefono) : "No informado"}<br>
             <strong>Tipo donante:</strong> ${fmt(item.donor?.tipo || "No informado", "name")}<br>

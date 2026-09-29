@@ -503,6 +503,29 @@ label {
 label .req { color: var(--terracotta); margin-left: 3px; }
 label .opt { color: var(--ink-30); font-weight: 400; font-size: 11px; margin-left: 4px; }
 
+.anonymous-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--sand-dark);
+  border-radius: 6px;
+  background: var(--white);
+  cursor: pointer;
+}
+
+.anonymous-choice input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--forest);
+  flex: 0 0 auto;
+}
+
+.anonymous-choice-copy { display: flex; flex-direction: column; gap: 4px; }
+.anonymous-choice-copy strong { font-size: 13px; color: var(--ink); }
+.anonymous-choice-copy span { font-size: 12px; line-height: 1.5; color: var(--ink-60); }
+
 input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
 select, textarea {
   font-family: 'Sora', sans-serif;
@@ -1474,6 +1497,14 @@ textarea { resize: vertical; min-height: 100px; }
           </div>
         </div>
 
+        <label class="anonymous-choice" for="donante-anonimo">
+          <input type="checkbox" id="donante-anonimo">
+          <span class="anonymous-choice-copy">
+            <strong>Quiero que mi donación figure como anónima</strong>
+            <span>Es una preferencia simbólica: el equipo municipal podrá ver tu nombre y tus datos de contacto para coordinar la donación.</span>
+          </span>
+        </label>
+
         <div class="btn-row">
           <div></div>
           <button class="btn-next" onclick="goNext(0)">
@@ -1660,6 +1691,10 @@ textarea { resize: vertical; min-height: 100px; }
             <div class="summary-row">
               <span class="summary-key">Nombre completo</span>
               <span class="summary-val" id="sum-nombre">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Preferencia de anonimato</span>
+              <span class="summary-val" id="sum-anonimo">No</span>
             </div>
             <div class="summary-row">
               <span class="summary-key">Email</span>
@@ -2214,6 +2249,7 @@ async function lookupDonationByCode() {
 function fillSummary() {
   const g = id => document.getElementById(id).value;
   document.getElementById('sum-nombre').textContent = g('nombre') + ' ' + g('apellido');
+  document.getElementById('sum-anonimo').textContent = document.getElementById('donante-anonimo').checked ? 'Sí, simbólica' : 'No';
   document.getElementById('sum-email').textContent = g('email');
   document.getElementById('sum-telefono').textContent = g('telefono');
   const donationsList = document.getElementById('sum-donations-list');
@@ -2265,7 +2301,8 @@ async function submitForm() {
       apellido: document.getElementById('apellido').value.trim(),
       email: document.getElementById('email').value.trim(),
       telefono: document.getElementById('telefono').value.trim(),
-      tipo: document.getElementById('tipo-donante').value || 'No informado'
+      tipo: document.getElementById('tipo-donante').value || 'No informado',
+      anonymous: document.getElementById('donante-anonimo').checked
     },
     donation: {
       items: donationItems.map(item => ({
