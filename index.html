@@ -1578,8 +1578,8 @@ textarea { resize: vertical; min-height: 100px; }
           <div class="field" id="vencimientoField" style="display:none;">
             <label>Fecha de vencimiento <span class="req">*</span></label>
             <input type="date" id="fecha-vencimiento">
-            <span class="field-hint">Solo para productos con vencimiento.</span>
-            <span class="field-error" id="err-vencimiento">Ingresá la fecha de vencimiento.</span>
+            <span class="field-hint">El producto debe vencer al menos dentro de 2 meses.</span>
+            <span class="field-error" id="err-vencimiento">La fecha debe ser de al menos 2 meses desde hoy.</span>
           </div>
         </div>
 
@@ -1955,12 +1955,21 @@ function toggleVencimientoField() {
   const err = document.getElementById('err-vencimiento');
   if (requiresVencimiento(selectedCat)) {
     field.style.display = 'flex';
+    input.min = getMinimumExpirationDate();
   } else {
     field.style.display = 'none';
     input.value = '';
     input.classList.remove('error');
     err.classList.remove('visible');
   }
+}
+
+function getMinimumExpirationDate(today = new Date()) {
+  const targetMonth = today.getMonth() + 2;
+  const targetYear = today.getFullYear() + Math.floor(targetMonth / 12);
+  const month = targetMonth % 12;
+  const day = Math.min(today.getDate(), new Date(targetYear, month + 1, 0).getDate());
+  return `${targetYear}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
 function clearDonationDraft() {
@@ -2030,7 +2039,9 @@ function validateStep1Fields() {
   else { document.getElementById('err-estado').classList.remove('visible'); }
   const vencInput = document.getElementById('fecha-vencimiento');
   const errVenc = document.getElementById('err-vencimiento');
-  if (requiresVencimiento(selectedCat) && !vencInput.value) {
+  const minimumExpirationDate = getMinimumExpirationDate();
+  vencInput.min = minimumExpirationDate;
+  if (requiresVencimiento(selectedCat) && (!vencInput.value || vencInput.value < minimumExpirationDate)) {
     vencInput.classList.add('error');
     errVenc.classList.add('visible');
     ok = false;
