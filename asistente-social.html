@@ -283,7 +283,10 @@
     }
 
     .expiry-alerts-panel { grid-column: 1 / -1; }
-    .expiry-alert-counts { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .expiry-alert-details { margin-top: 10px; }
+    .expiry-alert-details summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; cursor: pointer; color: var(--forest); font-size: 13px; font-weight: 700; }
+    .expiry-alert-counts { display: flex; gap: 8px; flex-wrap: wrap; margin: 0; }
+    .expiry-alert-list { display: grid; gap: 7px; margin-top: 12px; }
     .expiry-count, .expiry-badge {
       display: inline-flex;
       align-items: center;
@@ -294,7 +297,6 @@
     }
     .expiry-count.expired, .expiry-badge.expired { background: #FCE8E4; color: #8A3027; }
     .expiry-count.upcoming, .expiry-badge.upcoming { background: #FFF2D6; color: #79520B; }
-    .expiry-alert-list { display: grid; gap: 7px; }
     .expiry-alert-row { padding: 9px 10px; border-left: 3px solid #C8932E; background: #FFF9EC; font-size: 13px; line-height: 1.45; }
     .expiry-alert-row.expired { border-left-color: #A24A3F; background: #FFF3F0; }
     .expiry-empty { color: var(--ink-60); font-size: 13px; }
@@ -1292,11 +1294,16 @@
           <div class="dashboard-panel expiry-alerts-panel">
             <h3>Alertas de vencimiento</h3>
             <p>Productos vencidos o que vencen en los próximos 30 días.</p>
-            <div class="expiry-alert-counts">
-              <span class="expiry-count expired" id="expiredItemCount">Vencidos: 0</span>
-              <span class="expiry-count upcoming" id="upcomingItemCount">Próximos a vencer: 0</span>
-            </div>
-            <div class="expiry-alert-list" id="expiryAlertList" aria-live="polite"></div>
+            <details class="expiry-alert-details">
+              <summary>
+                <span>Ver detalle de productos</span>
+                <span class="expiry-alert-counts">
+                  <span class="expiry-count expired" id="expiredItemCount">Vencidos: 0</span>
+                  <span class="expiry-count upcoming" id="upcomingItemCount">Próximos a vencer: 0</span>
+                </span>
+              </summary>
+              <div class="expiry-alert-list" id="expiryAlertList" aria-live="polite"></div>
+            </details>
           </div>
           <div class="dashboard-panel summary-chart-wide"><h3>Donaciones recibidas</h3><p>Evolución de los últimos seis meses</p><div class="dashboard-chart" id="monthlyChart" aria-label="Donaciones recibidas por mes"></div></div>
           <div class="dashboard-panel"><h3>Donaciones por categoría</h3><p>Volumen de artículos recibidos</p><div class="dashboard-chart" id="categoryChart" aria-label="Donaciones por categoría"></div></div>
