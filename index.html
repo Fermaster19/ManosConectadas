@@ -2231,6 +2231,9 @@ async function lookupDonationByCode() {
   }
 
   try {
+    result.innerHTML = 'Conectando con la base de datos...';
+    await window.SUPABASE_WARMUP;
+    result.innerHTML = 'Buscando tu donación...';
     const query = new URLSearchParams({
       select: 'code,created_at,status,donation,coordination,donor',
       code: `eq.${code}`,
@@ -2373,7 +2376,14 @@ async function submitForm() {
     response: null
   };
 
+  const submitButton = document.querySelector('.btn-next.submit');
+  const submitButtonLabel = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = 'Conectando con la base de datos...';
+
   try {
+    await window.SUPABASE_WARMUP;
+    submitButton.textContent = 'Enviando donación...';
     const response = await fetch(`${SUPABASE_URL}/rest/v1/donations`, {
       method: 'POST',
       headers: {
@@ -2390,6 +2400,9 @@ async function submitForm() {
   } catch (error) {
     alert('No se pudo enviar la donación. Verificá que el servidor esté ejecutándose.');
     return;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = submitButtonLabel;
   }
 
   document.getElementById('stepsRow').style.display = 'none';
