@@ -1,3 +1,5 @@
+import { getGroqErrorMessage, requestGroqChat } from '../lib/groq-chat.js';
+
 const SYSTEM_PROMPT = `Eres el asistente virtual oficial de Manos Conectadas, una plataforma web municipal que centraliza y coordina donaciones solidarias.
 
 Información del proyecto:
@@ -41,24 +43,16 @@ export default async function handler(request, response) {
   }
 
   try {
-    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: process.env.GROQ_MODEL || 'groq/compound-mini',
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-        temperature: 0.4,
-        max_completion_tokens: 500
-      })
+    const { response: groqResponse, data } = await requestGroqChat({
+      apiKey,
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+      temperature: 0.4,
+      maxCompletionTokens: 500
     });
 
-    const data = await groqResponse.json();
     if (!groqResponse.ok) {
       console.error('Error de Groq:', data);
-      return response.status(502).json({ error: 'No pudimos responder en este momento.' });
+      return response.status(502).json({ error: getGroqErrorMessage(groqResponse.status, data) });
     }
 
     const content = data.choices?.[0]?.message?.content?.trim();

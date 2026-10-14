@@ -1,3 +1,5 @@
+import { getGroqErrorMessage, requestGroqChat } from "../lib/groq-chat.js";
+
 const SYSTEM_PROMPT = `Eres una IA de apoyo para asistentes sociales de Manos Conectadas.
 
 Usa exclusivamente los datos de donaciones incluidos en el contexto. Responde en español, con tono claro, profesional y breve. Puedes contar, filtrar, comparar y resumir donaciones; también puedes sugerir prioridades, pero la decisión final siempre la toma la asistente social.
@@ -70,38 +72,19 @@ export default async function handler(request, response) {
 	try {
 		const donations = await loadDonations(supabaseUrl, supabaseKey);
 		const context = JSON.stringify(donations);
-		const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${groqKey}`
-			},
-			body: JSON.stringify({
-				model: process.env.GROQ_MODEL || "groq/compound-mini",
-				messages: [
-					{ role: "system", content: SYSTEM_PROMPT },
-					{ role: "system", content: `Contexto actual de donaciones en JSON:\n${context}` },
-					...messages
-				],
-				temperature: 0.2,
-				max_completion_tokens: 700
-			})
+		const { response: groqResponse, data } = await requestGroqChat({
+			apiKey: groqKey,
+			messages: [
+				{ role: "system", content: SYSTEM_PROMPT },
+				{ role: "system", content: `Contexto actual de donaciones en JSON:\n${context}` },
+				...messages
+			],
+			temperature: 0.2,
+			maxCompletionTokens: 700
 		});
-
-		const data = await groqResponse.json();
 		if (!groqResponse.ok) {
 			console.error("Error de Groq para asistentes:", data);
-			const providerMessage = String(data.error?.message || "").trim().slice(0, 240);
-			const errorMessage = groqResponse.status === 401
-				? "La clave de Groq no es válida o venció. Revisa GROQ_API_KEY."
-				: groqResponse.status === 403
-					? "La clave de Groq no tiene acceso al modelo configurado."
-					: groqResponse.status === 404
-						? "El modelo de Groq no está disponible. Revisa GROQ_MODEL."
-						: groqResponse.status === 429
-							? "Groq alcanzó el límite de uso o cuota disponible."
-							: `Groq rechazó la consulta (HTTP ${groqResponse.status})${providerMessage ? `: ${providerMessage}` : "."}`;
-			return response.status(502).json({ error: errorMessage });
+			return response.status(502).json({ error: getGroqErrorMessage(groqResponse.status, data) });
 		}
 
 		const content = data.choices?.[0]?.message?.content?.trim();

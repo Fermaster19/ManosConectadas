@@ -449,7 +449,7 @@ Las funciones ubicadas en `api/` requieren variables de entorno para operar con 
 
 ```text
 GROQ_API_KEY=tu-clave-secreta-de-groq
-GROQ_MODEL=groq/compound-mini
+GROQ_MODEL=openai/gpt-oss-20b
 SUPABASE_URL=https://tu-proyecto.supabase.co
 SUPABASE_ANON_KEY=tu-clave-anon
 SUPABASE_SERVICE_ROLE_KEY=tu-clave-privada-opcional
@@ -670,7 +670,7 @@ Las funciones serverless utilizan variables de entorno:
 
 ```text
 GROQ_API_KEY=clave-privada-de-groq
-GROQ_MODEL=groq/compound-mini
+GROQ_MODEL=openai/gpt-oss-20b
 SUPABASE_URL=https://tu-proyecto.supabase.co
 SUPABASE_ANON_KEY=clave-anonima
 SUPABASE_SERVICE_ROLE_KEY=clave-privada-opcional
