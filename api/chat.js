@@ -31,10 +31,10 @@ export default async function handler(request, response) {
     : [];
   const messages = incomingMessages
     .filter((message) => message && ['user', 'assistant'].includes(message.role))
-    .slice(-12)
+    .slice(-6)
     .map((message) => ({
       role: message.role,
-      content: String(message.content || '').trim().slice(0, 2000)
+      content: String(message.content || '').trim().slice(0, 800)
     }))
     .filter((message) => message.content);
 
