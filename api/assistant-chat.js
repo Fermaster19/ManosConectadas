@@ -91,7 +91,17 @@ export default async function handler(request, response) {
 		const data = await groqResponse.json();
 		if (!groqResponse.ok) {
 			console.error("Error de Groq para asistentes:", data);
-			return response.status(502).json({ error: "No pudimos responder en este momento." });
+			const providerMessage = String(data.error?.message || "").trim().slice(0, 240);
+			const errorMessage = groqResponse.status === 401
+				? "La clave de Groq no es válida o venció. Revisa GROQ_API_KEY."
+				: groqResponse.status === 403
+					? "La clave de Groq no tiene acceso al modelo configurado."
+					: groqResponse.status === 404
+						? "El modelo de Groq no está disponible. Revisa GROQ_MODEL."
+						: groqResponse.status === 429
+							? "Groq alcanzó el límite de uso o cuota disponible."
+							: `Groq rechazó la consulta (HTTP ${groqResponse.status})${providerMessage ? `: ${providerMessage}` : "."}`;
+			return response.status(502).json({ error: errorMessage });
 		}
 
 		const content = data.choices?.[0]?.message?.content?.trim();
