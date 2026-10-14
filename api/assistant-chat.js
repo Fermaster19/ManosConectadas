@@ -2,9 +2,13 @@ import { getGroqErrorMessage, requestGroqChat } from "../lib/groq-chat.js";
 
 const SYSTEM_PROMPT = `Eres una IA de apoyo para asistentes sociales de Manos Conectadas.
 
-Usa exclusivamente los datos de donaciones incluidos en el contexto. El resumen contiene conteos de todas las donaciones consultadas; los detalles son una selección reciente y relevante, no necesariamente una lista completa. Responde en español, con tono claro, profesional y breve. Puedes contar, filtrar, comparar y resumir donaciones; también puedes sugerir prioridades, pero la decisión final siempre la toma la asistente social.
+Usa exclusivamente los datos de donaciones incluidos en el contexto. El resumen se calcula con todas las donaciones de la base de datos; los registros detallados pueden ser solo una selección relevante. No presentes esa selección como una lista completa ni deduzcas que un dato no existe solo porque no aparece en ella. Si el contexto no alcanza para contestar con precisión, dilo claramente. Responde en español, con tono claro, profesional y breve. Puedes contar, filtrar, comparar y resumir donaciones; también puedes sugerir prioridades, pero la decisión final siempre la toma la asistente social.
 
 No inventes datos. Si el contexto no permite responder, dilo explícitamente. Los asistentes pueden solicitar los datos del donante para coordinar una entrega o retiro; muestra teléfono, correo y dirección solo cuando la consulta los pida o sean necesarios para esa coordinación. Nunca expongas contraseñas. Cuando listes donaciones, incluye su código y el dato relevante. Los estados de seguimiento pueden ser: Pendiente de coordinación, Para retirar, En bodega de la municipalidad, En tránsito y Entregada.`;
+
+const DONATIONS_PAGE_SIZE = 1000;
+const MAX_CONTEXT_RECORDS = 60;
+const MAX_CONTEXT_LENGTH = 22000;
 
 function getConfig() {
 	return {
@@ -26,15 +30,10 @@ function countBy(donations, getValue) {
 		const label = textValue(getValue(donation), 60) || "Sin dato";
 		counts.set(label, (counts.get(label) || 0) + 1);
 	}
-	const entries = [...counts.entries()].sort((left, right) => right[1] - left[1]);
-	const result = entries.slice(0, 12);
-	if (entries.length > 12) {
-		result.push(["Otros", entries.slice(12).reduce((total, entry) => total + entry[1], 0)]);
-	}
-	return Object.fromEntries(result);
+	return Object.fromEntries([...counts.entries()].sort((left, right) => right[1] - left[1]));
 }
 
-function compactDonation(donation, includeContacts) {
+function compactDonation(donation, { includeContacts, includeDonorName, includeResponses }) {
 	const donor = donation.donor || {};
 	const details = donation.donation || {};
 	const coordination = donation.coordination || {};
@@ -51,30 +50,48 @@ function compactDonation(donation, includeContacts) {
 		donor_type: textValue(donor.tipo, 40),
 		modality: textValue(coordination.modalidad, 40),
 		preference: textValue(coordination.preferencia, 100),
-		has_response: donation.has_response
+		has_response: donation.has_response,
+		has_photos: Array.isArray(donation.photos) && donation.photos.length > 0,
+		donation_details: textValue(details, 700),
+		coordination_details: textValue(includeContacts
+			? coordination
+			: Object.fromEntries(Object.entries(coordination).filter(([key]) => !/direcci|address|telefono|phone|email|correo/i.test(key))), 500)
 	};
+	if (includeDonorName || includeContacts) {
+		compact.donor_name = [textValue(donor.nombre, 60), textValue(donor.apellido, 60)].filter(Boolean).join(" ");
+	}
 	if (includeContacts) {
 		compact.phone = textValue(donor.telefono, 40);
 		compact.email = textValue(donor.email, 80);
 		compact.address = textValue(coordination.direccion, 100);
 	}
+	if (includeResponses) compact.response = textValue(donation.response, 300);
 	return compact;
 }
 
 function buildDonationContext(donations, question) {
-	const includeContacts = /\b(teléfono|telefono|correo|email|dirección|direccion|domicilio|contacto)\b/i.test(question);
+	const asksForContacts = /\b(teléfono|telefono|correo|email|dirección|direccion|domicilio|contacto)\b/i.test(question);
+	const asksForCoordination = /\b(coordinar|coordinación|coordinacion|retiro|entrega)\b/i.test(question);
+	const requestsCoordinationContacts = asksForCoordination
+		&& (/\b(datos|donante|contactar|llamar|teléfono|telefono|correo|email)\b/i.test(question)
+			|| /\bMC-\d{4}-\d+\b/i.test(question));
+	const includeContacts = asksForContacts || requestsCoordinationContacts;
+	const includeDonorName = /\b(donante|nombre|quién|quien|persona)\b/i.test(question);
+	const includeResponses = /\b(respuesta|respondida|respondido|mensaje|contestación|contestacion)\b/i.test(question);
 	const stopWords = new Set(["cuantas", "cuantos", "donacion", "donaciones", "estan", "tienen", "estado", "cuales", "lista", "hay", "para", "con", "del", "las", "los", "una", "por"]);
 	const terms = [...new Set((question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").match(/[\p{L}\d-]{4,}/gu) || []).filter((term) => !stopWords.has(term)))];
 	const ranked = donations.map((donation, index) => {
-		const record = compactDonation(donation, includeContacts);
+		const record = compactDonation(donation, { includeContacts, includeDonorName, includeResponses });
 		const searchable = JSON.stringify(record).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 		const score = terms.reduce((total, term) => total + Number(searchable.includes(term)), 0);
 		return { record, index, score };
 	});
 	ranked.sort((left, right) => right.score - left.score || left.index - right.index);
-	const records = ranked.slice(0, 15).map((entry) => entry.record);
+	const records = ranked.slice(0, MAX_CONTEXT_RECORDS).map((entry) => entry.record);
 	const summary = {
 		records_loaded: donations.length,
+		earliest_date: donations.map((donation) => donation.created_at).filter(Boolean).sort()[0]?.slice(0, 10) || null,
+		latest_date: donations.map((donation) => donation.created_at).filter(Boolean).sort().at(-1)?.slice(0, 10) || null,
 		by_status: countBy(donations, (donation) => donation.status),
 		by_tracking_status: countBy(donations, (donation) => donation.tracking_status),
 		by_category: countBy(donations, (donation) => donation.donation?.categoria),
@@ -83,25 +100,51 @@ function buildDonationContext(donations, question) {
 		with_response: donations.filter((donation) => donation.has_response).length,
 		without_response: donations.filter((donation) => !donation.has_response).length
 	};
-	const context = { summary, records };
+	const context = {
+		summary,
+		records_complete: records.length === donations.length,
+		records_in_context: records.length,
+		records
+	};
 	let serialized = JSON.stringify(context);
-	while (serialized.length > 8000 && context.records.length > 1) {
+	while (serialized.length > MAX_CONTEXT_LENGTH && context.records.length > 1) {
 		context.records.pop();
+		context.records_in_context = context.records.length;
+		context.records_complete = context.records.length === donations.length;
 		serialized = JSON.stringify(context);
 	}
 	return serialized;
 }
 
 async function loadDonations(supabaseUrl, supabaseKey) {
-	const url = `${supabaseUrl}/rest/v1/donations?select=id,sequence,code,created_at,donor,donation,coordination,response,status,tracking_status&order=sequence.desc&limit=200`;
-	const result = await fetch(url, {
-		headers: {
-			apikey: supabaseKey,
-			Authorization: `Bearer ${supabaseKey}`
-		}
-	});
-	if (!result.ok) throw new Error("No se pudieron consultar las donaciones.");
-	const rows = await result.json();
+	const url = new URL(`${supabaseUrl}/rest/v1/donations`);
+	url.searchParams.set("select", "id,sequence,code,created_at,donor,donation,coordination,response,status,tracking_status,photos");
+	url.searchParams.set("order", "sequence.desc");
+	const rows = [];
+	let offset = 0;
+	let total = null;
+
+	while (total === null || offset < total) {
+		const result = await fetch(url, {
+			headers: {
+				apikey: supabaseKey,
+				Authorization: `Bearer ${supabaseKey}`,
+				Prefer: "count=exact",
+				Range: `${offset}-${offset + DONATIONS_PAGE_SIZE - 1}`
+			}
+		});
+		if (!result.ok) throw new Error("No se pudieron consultar las donaciones.");
+		const page = await result.json();
+		if (!Array.isArray(page)) throw new Error("Supabase devolvió un formato de donaciones no válido.");
+
+		rows.push(...page);
+		offset += page.length;
+		const range = result.headers.get("content-range");
+		const totalMatch = range?.match(/\/(\d+)$/);
+		if (totalMatch) total = Number(totalMatch[1]);
+		if (!page.length || (total === null && page.length < DONATIONS_PAGE_SIZE)) break;
+	}
+
 	return rows.map((row) => ({
 		id: row.id,
 		sequence: row.sequence,
@@ -110,6 +153,8 @@ async function loadDonations(supabaseUrl, supabaseKey) {
 		donor: row.donor || {},
 		donation: row.donation || {},
 		coordination: row.coordination || {},
+		photos: row.photos || [],
+		response: row.response,
 		status: row.status || "pending",
 		tracking_status: row.tracking_status || "Pendiente de coordinación",
 		has_response: Array.isArray(row.response)
@@ -158,7 +203,7 @@ export default async function handler(request, response) {
 				...messages
 			],
 			temperature: 0.2,
-			maxCompletionTokens: 400
+			maxCompletionTokens: 800
 		});
 		if (!groqResponse.ok) {
 			console.error("Error de Groq para asistentes:", data);

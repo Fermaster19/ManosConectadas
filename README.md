@@ -759,7 +759,7 @@ Cuerpo esperado:
 }
 ```
 
-La función consulta hasta 200 donaciones ordenadas por `sequence`, construye un contexto JSON y lo envía a Groq. No debe utilizarse para exponer información a usuarios no autorizados.
+La función pagina todas las donaciones de Supabase, calcula resúmenes sobre el historial completo y envía a Groq hasta 60 registros relevantes (o menos si se alcanza el límite de contexto). Los datos de contacto solo se incluyen cuando la consulta los pide o son necesarios para coordinar una donación específica. Si la selección de registros está incompleta, no debe presentarse como exhaustiva. El endpoint contiene datos operativos y no debe exponerse a usuarios no autorizados.
 
 ## 11. Configuración de EmailJS
 
